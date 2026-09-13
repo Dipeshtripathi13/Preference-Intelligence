@@ -1,0 +1,18 @@
+\section{Preference Representation}
+\label{sec:representation}
+
+Each preference record contains a stable identifier, bounded dimension and value,
+scope tuple $(d,s,t)$ for domain, subdomain, and task, confidence, lifecycle state,
+source type, evidence counts, timestamps, decay policy, user lock, user-authored
+evidence, and provenance. Null scope components form a global default; more
+specific compatible records override broader records for the same dimension.
+
+This hybrid symbolic representation is human-readable and deterministically
+filterable while allowing learned components to propose updates. Natural-language
+compilation occurs only after selection. Assistant responses and webpage text are
+untrusted inputs and cannot independently become user evidence. Users can inspect,
+edit, lock, suppress, or delete values.
+
+\evidencegap{Confidence calibration and observed editability require approved
+participant data. Schema conformance is covered by software tests, but is not a
+user outcome.}

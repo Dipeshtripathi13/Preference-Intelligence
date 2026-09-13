@@ -1,0 +1,11 @@
+model,condition,n,reference_coverage,concise_proxy,word_count,provider_input_tokens,provider_output_tokens,latency_ms,automatic_pass_rate,length_termination
+llama3.2:1b,domain_dynamic,8,0.34375,0.5,141.75,196.25,197.25,3572.501,0.8125,0.75
+llama3.2:1b,dynamic_global,8,0.260417,0.375,146.625,139.75,197.0,3949.497125,0.75,0.75
+llama3.2:1b,history_rag,8,0.291667,0.5,104.5,133.75,138.125,2624.493375,0.8125,0.5
+llama3.2:1b,no_personalization,8,0.21875,0.25,188.375,82.75,246.0,4313.988125,0.875,0.75
+llama3.2:1b,static_global,8,0.3125,0.5,141.25,121.75,197.0,3482.20675,0.875,0.75
+qwen3:8b,domain_dynamic,8,0.458333,0.875,141.0,197.75,198.75,12693.391375,1.0,0.5
+qwen3:8b,dynamic_global,8,0.520833,0.75,146.125,138.25,194.75,12813.598375,1.0,0.25
+qwen3:8b,history_rag,8,0.604167,1.0,74.0,130.25,100.375,6511.463125,1.0,0.0
+qwen3:8b,no_personalization,8,0.4375,0.75,164.0,79.25,222.375,14210.819,1.0,0.5
+qwen3:8b,static_global,8,0.541667,1.0,107.375,118.25,138.75,8790.715,1.0,0.0

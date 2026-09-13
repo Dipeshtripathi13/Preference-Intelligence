@@ -1,0 +1,39 @@
+{
+  "analysis_version": "0.2.0",
+  "blinded_pairs": 32,
+  "conditions": [
+    "domain_dynamic",
+    "history_rag",
+    "no_personalization"
+  ],
+  "failures": 0,
+  "human_ratings_collected": false,
+  "input_files": [
+    {
+      "path": "data/compact-ablation-qwen3-8b-20260914.jsonl",
+      "sha256": "38c209af686e60daf3fa940208f78b4a5989f245a0f8780ca6e274799945726e"
+    },
+    {
+      "path": "data/compact-ablation-llama3.2-1b-20260914.jsonl",
+      "sha256": "5af6ec1f3d39d29a4ae6feeab4254ce390bee2e333957bacb7a9c774abcb5ec4"
+    }
+  ],
+  "models": [
+    "llama3.2:1b",
+    "qwen3:8b"
+  ],
+  "post_hoc_metrics": true,
+  "random_seed": 20260914,
+  "records": 48,
+  "replicates": [
+    0,
+    1
+  ],
+  "status": "exploratory_real_local_model_pilot",
+  "tasks": [
+    "finance_diversification_01",
+    "finance_duration_01",
+    "se_java_virtual_threads_01",
+    "se_kafka_rebalance_01"
+  ]
+}

@@ -1,0 +1,91 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage[nameinlink,capitalise]{cleveref}
+\usepackage{enumitem}
+\usepackage{natbib}
+\setlength{\emergencystretch}{2em}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!45!black,
+  citecolor=green!35!black,
+  urlcolor=blue!55!black
+}
+
+\newcommand{\systemname}{Preference Intelligence}
+\newcommand{\evidencegap}[1]{%
+  \begin{center}
+  \fcolorbox{orange!70!black}{orange!4}{%
+    \parbox{0.90\linewidth}{\textbf{Not measured in the current study:} #1}}
+  \end{center}}
+
+\title{User-Owned Preference Policies for Cross-Model, Domain-Conditioned
+Language-Model Personalization}
+\author{Anonymous authors}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Language-model products commonly keep response preferences inside one provider
+or conflate preferences with conversational memory. We formulate personalization
+as a user-owned behavioral policy: typed preferences are selected by domain and
+task, compiled into a provider-neutral instruction, and remain inspectable,
+reversible, and subordinate to the current request. We contribute an auditable
+representation with scope, confidence, provenance, and locks; five comparison
+conditions; a controlled multidomain benchmark; and a reproducible execution and
+blinded-evaluation pipeline. In an exploratory two-model local pilot comprising
+128 real generations, a compact structured policy used 19.0 fewer input tokens
+per prompt than a short history-retrieval baseline, but produced 70.8 more words
+and added 3.12 seconds of latency on average. Its post-hoc reference-concept
+coverage was indistinguishable within a wide exploratory interval
+($\Delta=0.005$, 95\% cluster-bootstrap interval $[-0.141,0.177]$). The result
+shows that input-context compression alone does not establish end-to-end
+efficiency. No human ratings have yet been collected, so improved subjective
+quality remains an open hypothesis rather than a reported result.
+\end{abstract}
+
+\input{sections/01_introduction}
+\input{sections/02_related_work}
+\input{sections/03_problem_formulation}
+\input{sections/04_preference_representation}
+\input{sections/05_dynamic_learning}
+\input{sections/06_domain_conditioning}
+\input{sections/07_experimental_setup}
+\input{sections/08_results}
+\input{sections/09_ablations}
+\input{sections/10_human_evaluation}
+\input{sections/11_discussion}
+\input{sections/12_privacy_safety_limitations}
+\input{sections/13_conclusion}
+
+\section*{Reproducibility statement}
+The repository contains versioned benchmark inputs, deterministic mock generation,
+provider adapters, condition compilation, randomized real local-model runs, raw
+JSONL responses, immutable input hashes, analysis code, and condition-blinded
+annotation files. The reported pilot data use Qwen~3 8B and Llama~3.2 1B served
+locally; all 128 assigned generations completed. No human judgments, private
+participant data, API credentials, or fabricated outcomes are included.
+
+\section*{Acknowledgments}
+Withheld for anonymous review.
+
+\IfFileExists{../literature/references.bib}{%
+  \bibliographystyle{plainnat}
+  \bibliography{../literature/references}
+}{%
+  \paragraph{Bibliography status.} A verified bibliography has not yet been
+  linked. Do not insert placeholder citations.
+}
+
+\end{document}

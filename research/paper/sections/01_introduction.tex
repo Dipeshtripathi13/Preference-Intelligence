@@ -1,0 +1,41 @@
+\section{Introduction}
+\label{sec:introduction}
+
+People use multiple large language models (LLMs), but each interface typically
+receives only a local account setting, a manually repeated instruction, or a
+provider-specific memory. The resulting problem is not only remembering what a
+person said. It is representing \emph{how that person wants a response to be
+constructed for the task at hand} and transferring that representation without
+assuming that expertise or style in one domain applies everywhere.
+
+We call this proposed layer \systemname{}. Its design goals are portability across
+model providers, contextual selection, and transparent user control. A response
+preference is an instruction-like behavioral constraint---such as desired depth,
+format, or use of examples---rather than a demographic label or an assertion
+about identity. The current request always outranks a stored default.
+
+The primary research question is whether a dynamically learned,
+domain-conditioned, provider-independent preference representation improves
+subjective response quality across heterogeneous model families. We further ask
+whether it improves on static profiles and history retrieval, whether learning is
+reliable under drift and adversarial evidence, and whether structured profiles
+reduce context overhead.
+
+The contributions of the present artifact are:
+\begin{enumerate}[leftmargin=*]
+  \item a formal, inspectable \emph{preference policy} representation and
+  applicability problem that separates response behavior from conversation memory;
+  \item a behavioral-conformance framing of portability: an unchanged profile
+  must induce the intended scoped behavior across model families, not merely
+  serialize successfully;
+  \item a benchmark and human-study protocol targeting domain isolation,
+  preference learning, context efficiency, drift, and incorrect inference; and
+  \item a local-first reference implementation and reproducible comparison of five
+  personalization conditions, including 128 real local-model generations and an
+  observed prompt-compression/output-expansion trade-off.
+\end{enumerate}
+
+The representation and pipeline are implemented contributions; the pilot is
+exploratory systems evidence. It does not establish the primary subjective-quality
+hypothesis. Irrelevant, stale, or incorrect preferences can still reduce quality
+or undermine user control.

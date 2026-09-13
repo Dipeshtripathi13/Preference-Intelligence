@@ -1,0 +1,16 @@
+\section{Domain-Conditioned Personalization}
+\label{sec:conditioning}
+
+Domain conditioning prevents a local observation---for example, advanced Java
+knowledge---from becoming a general assumption about finance or physics. The
+selector admits global defaults and compatible domain, subdomain, and task
+records, resolves each dimension by specificity and authority, and applies a
+confidence threshold. Missing domain knowledge remains unknown.
+
+The controlled benchmark deliberately pairs high familiarity in one domain with
+low familiarity in another. It also includes ambiguous domains and explicit
+current-request overrides. The central mechanism ablation removes scope while
+holding the evidence and token budget fixed.
+
+\evidencegap{Domain leakage, relevant-preference recall, and domain-conditioned
+versus global contrasts require the locked generation and blinded rating study.}

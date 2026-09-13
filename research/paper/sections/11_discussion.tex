@@ -1,0 +1,29 @@
+\section{Discussion}
+\label{sec:discussion}
+
+The pilot supports syntactic portability but not yet behavioral conformance: one
+unchanged structured profile was accepted by two heterogeneous model families,
+yet the small automatic analysis cannot show that either family produced answers
+the target user would prefer. That distinction prevents a successful serializer
+or prompt injector from being mislabeled as successful personalization.
+
+The compiler ablation also exposes a cost-accounting trap. A compressed policy can
+save input tokens while increasing generated tokens and wall-clock latency. In our
+sample, directive-like compact clauses appear to have encouraged fuller responses
+despite a global concise preference. This interpretation is mechanistic and
+post-hoc; output caps and unequal model sizes are alternative explanations. Future
+work should jointly optimize adherence, correctness, input tokens, output tokens,
+and truncation rather than treating prompt length as the efficiency endpoint.
+
+The near-zero compact E-versus-history difference on reference coverage should not
+be read as equivalence. The interval is wide, the diagnostic is lexical, and only
+one synthetic persona and four tasks were used. Conversely, the absence of a
+positive automatic result is useful counterevidence against assuming that typed
+profiles automatically improve answers. The condition-blinded files now make the
+next decisive step concrete: target-user preference judgments and independent
+correctness review under a frozen analysis plan.
+
+The larger research program should distinguish broad benefit, style-only benefit,
+provider and domain heterogeneity, and net harm from incorrect or stale preferences.
+Practical effect sizes, correction burden, and abstention quality matter more than
+statistical significance alone.

@@ -1,0 +1,55 @@
+{
+  "version": "0.1.0",
+  "classification_threshold": 0.55,
+  "domains": [
+    {
+      "id": "software_engineering",
+      "label": "Software Engineering",
+      "children": [
+        { "id": "backend", "label": "Backend", "children": ["java", "python", "distributed_systems"] },
+        { "id": "frontend", "label": "Frontend", "children": [] },
+        { "id": "databases", "label": "Databases", "children": [] }
+      ]
+    },
+    {
+      "id": "machine_learning",
+      "label": "Machine Learning",
+      "children": [
+        { "id": "deep_learning", "label": "Deep Learning", "children": [] },
+        { "id": "nlp", "label": "Natural Language Processing", "children": [] },
+        { "id": "computer_vision", "label": "Computer Vision", "children": [] }
+      ]
+    },
+    {
+      "id": "science",
+      "label": "Science",
+      "children": [
+        { "id": "physics", "label": "Physics", "children": [] },
+        { "id": "biology", "label": "Biology", "children": [] },
+        { "id": "chemistry", "label": "Chemistry", "children": [] }
+      ]
+    },
+    { "id": "finance", "label": "Finance", "children": [] },
+    { "id": "legal", "label": "Legal", "children": [] },
+    { "id": "health", "label": "Health", "children": [] },
+    { "id": "education", "label": "Education", "children": [] },
+    { "id": "professional_writing", "label": "Professional Writing", "children": [] },
+    { "id": "creative_writing", "label": "Creative Writing", "children": [] },
+    { "id": "general", "label": "General", "children": [] }
+  ],
+  "tasks": [
+    "explanation",
+    "implementation",
+    "debugging",
+    "summarization",
+    "comparison",
+    "planning",
+    "editing",
+    "brainstorming"
+  ],
+  "non_transferable_dimensions": [
+    "technical_depth",
+    "explanation_level",
+    "math_depth"
+  ]
+}

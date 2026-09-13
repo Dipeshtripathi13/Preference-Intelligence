@@ -1,0 +1,514 @@
+[
+  {
+    "pair_id": "9bde8e35-13cf-5500-b508-bb6a81d87b66",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "4a85491f-f421-54b5-86d6-1c51a7a922c7",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "c67e3502-9542-5922-b0db-03734131e283",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "no_personalization",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "c48e5807-ef3c-5428-b169-83e0022e74b3",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "8903fd57-9c88-57b0-88c5-de305e6fac84",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "f5243e4d-4db0-5f06-ba77-7444aa7cb104",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "c3cd8d2e-d072-5059-a7c7-22f3e856d71d",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "no_personalization",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "eec93cf2-0e71-566d-a59c-e3c47e60bc52",
+    "model": "llama3.2:1b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "61b7ef25-d99f-53f2-b9ee-1499a74a53cf",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "6c802875-f754-56d2-b6bb-67c452c69ecc",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "b4bc8208-4ef9-5b04-ac8f-fab463b1bd17",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "32ade3e4-9bc9-5846-b3e1-07703ab2e62b",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "69f0011b-871f-53b2-8fac-8602162ec670",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "16f5799f-1793-5519-843a-6ca5df181ffb",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "09b999b4-1a1c-5888-9c0d-3672f40dcd6d",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "a13e0239-8ae5-5368-9643-e37c3d5ceff0",
+    "model": "llama3.2:1b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  },
+  {
+    "pair_id": "70722e5e-6f11-50f8-9c80-1900e9fb35ed",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "85866e13-19cb-5186-9449-58e40ec1879f",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "history_rag"
+  },
+  {
+    "pair_id": "4266cc29-d5ee-5dc4-b955-13fdb64d975d",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "7990a0ed-7ad5-5e65-93cd-c8a733ffd365",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "0ab2ee23-cf87-5dd7-b13c-baac729a2459",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "1c5dba13-b40f-54e9-aecc-00e7be213b2f",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "history_rag"
+  },
+  {
+    "pair_id": "c0246aa6-9fd9-5225-968b-0ae2286941e2",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "b96ef6f8-f03c-530c-a98c-249cdb5cccaa",
+    "model": "llama3.2:1b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "f25848e3-5b03-5ef2-8fd1-82c882519d3a",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "81e7091f-c79c-5001-a4ee-9560333925b5",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "e4e42386-f3e8-54d4-b6f8-3d6afe4f87a9",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "f9089291-8193-5bec-afe1-49ce8ef025d4",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "913bdc49-6381-55c4-b88c-fbf7201243a5",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "98294e25-e3b9-589e-bd46-ae258da59dbd",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "c2e1db79-514a-5c55-86c8-b2b781e024b5",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "no_personalization",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "b6ecfb46-4e78-59ad-be6e-0c1c1311728f",
+    "model": "llama3.2:1b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  },
+  {
+    "pair_id": "900a6f1e-8004-54ca-84ce-92bddc5d8fda",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "e0133d86-47dc-5085-a594-bb64e5dc9966",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "31686abc-fffb-5cbe-b3b0-ea5198795841",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "ba0ebcd9-b6ce-5729-a0fd-efc1a40ed8ae",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 0,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "73023f7d-6b7b-57cb-a7b2-9606482640e1",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "97b19c39-f9bc-5338-8167-585f955984df",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "32ffe49a-155d-58ae-a5e5-d5728ca45949",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "c65b495b-10f5-5f19-af8d-7c77ebedb04a",
+    "model": "qwen3:8b",
+    "task_id": "finance_diversification_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  },
+  {
+    "pair_id": "776ad4ce-1844-593d-b487-ae7b9f8649ad",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "e38cdb2a-bd5a-5c64-91ba-07004b9b0758",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "688ae208-4169-5779-b878-ba94c4883f93",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "68c3d191-6732-597b-b638-548160fb48a8",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  },
+  {
+    "pair_id": "38d737f1-9d77-5e3a-916a-f65aa3d202b5",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "c6395930-ca28-5e73-8fea-2c10b862da1f",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "history_rag"
+  },
+  {
+    "pair_id": "aec415b4-5e70-5d21-873b-0b935acd6a28",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "068dc653-58cd-5c6c-af7d-9f442c223d1a",
+    "model": "qwen3:8b",
+    "task_id": "finance_duration_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  },
+  {
+    "pair_id": "896ef25a-a9d6-5b28-ab7b-0bc085a0d83f",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "27f69eae-1eff-5d62-84f9-888d2a8a56a2",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "a6e672cd-5108-53b7-a9e0-d4889b2eca4b",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "no_personalization",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "1cc613b1-efa2-5cd8-990c-19821244bcba",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 0,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  },
+  {
+    "pair_id": "221df20e-6678-5051-9dd7-9762f98ba3ea",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "f1b8bfb5-0ff9-526d-a961-f784e90e1904",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "8f85dcb5-76f7-5003-9981-f8c4ac1f5548",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "no_personalization"
+  },
+  {
+    "pair_id": "3aa648ee-c423-5594-b712-2f93cf0261eb",
+    "model": "qwen3:8b",
+    "task_id": "se_java_virtual_threads_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  },
+  {
+    "pair_id": "fa73481e-1277-570c-8176-90cbc2c4ac63",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "dynamic_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "1c746e4d-686e-53c2-897a-25292f071884",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "history_rag",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "72dc247a-c68e-51df-a254-6fb8bffd1f49",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "no_personalization",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "72b3bcdb-94f3-5e10-a333-4d0dc78bdf45",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 0,
+    "response_a_condition": "static_global",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "7e6e57fd-34f1-5e73-8f4e-bae608798f4b",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "dynamic_global"
+  },
+  {
+    "pair_id": "ae453187-f5c6-55bd-9900-d4df624784c2",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "history_rag"
+  },
+  {
+    "pair_id": "23cbbef8-5a37-5a5c-8078-aa198364f5b5",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "no_personalization",
+    "response_b_condition": "domain_dynamic"
+  },
+  {
+    "pair_id": "5d890d00-660b-5079-883b-f94f090543a7",
+    "model": "qwen3:8b",
+    "task_id": "se_kafka_rebalance_01",
+    "replicate": 1,
+    "response_a_condition": "domain_dynamic",
+    "response_b_condition": "static_global"
+  }
+]

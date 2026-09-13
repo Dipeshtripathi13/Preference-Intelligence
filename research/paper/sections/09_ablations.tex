@@ -1,0 +1,22 @@
+\section{Ablation Studies}
+\label{sec:ablations}
+
+The broader planned ablations independently remove domain scope, confidence gating,
+recency decay, evidence-source weighting, provenance filtering, conflict handling,
+and user locks. Representation baselines compare structured records with a
+natural-language profile and multiple history retrievers. Tests hold evidence,
+task allocation, generation settings, and applicable token budget fixed.
+
+The first completed ablation changed only the compiler surface form from a verbose
+record serialization to compact behavioral clauses. It reduced the representative
+compiled profile from 447 to 158 characters and reversed the input-token contrast
+against history retrieval from $+65.0$ to $-19.0$ tokens per prompt. It did not
+improve the exploratory reference proxy and increased both generated length and
+latency (\cref{sec:results}). This identifies compiler wording and total generated
+tokens---not profile storage alone---as necessary experimental factors.
+
+\evidencegap{The remaining preregistered component ablations and their
+full-versus-ablation effects with corrected intervals,
+including adherence precision and recall, false activations, domain leakage,
+adaptation delay, context cost, and safety failures. An ablation that activates
+every preference must not be credited for recall without its precision cost.}

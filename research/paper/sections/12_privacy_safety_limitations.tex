@@ -1,0 +1,34 @@
+\section{Privacy, Safety, and Limitations}
+\label{sec:limitations}
+
+A portable profile can reduce repeated disclosure but can also centralize
+sensitive behavioral information. The proposed system is local-first, minimizes
+raw conversation retention, records provenance, rejects assistant/webpage text as
+preference authority, and makes profile values user-visible and deletable.
+Cross-provider use remains a disclosure event and must be explicit and scoped.
+
+Preferences never authorize unsafe output. The representation avoids unnecessary
+sensitive traits and stores desired explanation behavior rather than demographic
+inferences. Synthetic privacy canaries are used for leakage tests; real secrets
+must not be planted.
+
+The benchmark's controlled personas may exaggerate coherence and stability,
+automatic checks reward surface compliance, English-only tasks limit cultural and
+linguistic generalization, provider updates challenge reproducibility, and
+self-reported familiarity is not a complete expertise measure. Repeated exposure
+can construct preferences rather than merely reveal them. The history-retrieval
+baseline is sensitive to retriever quality. A positive average effect could hide
+provider-specific or domain-specific harm.
+
+The executed pilot adds several concrete limitations. It uses two quantized local
+models of very different capacity, one synthetic persona, four English tasks, two
+replicates, a 260-token cap, and a post-hoc lexical concept diagnostic. Several
+outputs stopped at the length limit. The local endpoint avoids third-party data
+disclosure but does not represent hosted-provider policies or behavior. Cluster
+bootstrap intervals over only eight model--task clusters are unstable. The
+compiler ablation was motivated after inspection of the first run and is therefore
+hypothesis-generating. No human preference, editability, privacy-leakage, or
+longitudinal-learning outcome was measured.
+
+\evidencegap{Adverse-output, privacy-exposure, subgroup, accessibility, and hosted
+provider data-retention outcomes. The local pilot contained no participant data.}

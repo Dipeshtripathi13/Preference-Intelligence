@@ -1,0 +1,45 @@
+{
+  "actual_provider": "local",
+  "conditions": [
+    "no_personalization",
+    "static_global",
+    "history_rag",
+    "dynamic_global",
+    "domain_dynamic"
+  ],
+  "created_at": "2026-09-13T15:09:44.255382Z",
+  "dry_run": false,
+  "experiment_id": "local-pilot-llama3.2-1b-20260913",
+  "git_commit": null,
+  "history_top_k": 4,
+  "input_sha256": {
+    "personas": "0a1173d089cf5d2d9a711a72b246ac9e37f4cbfea6039c22c905bce0c43af07f",
+    "tasks": "b424cab67dc219686369ce6e133948c4a9db86a6ba4ce61c9375476967c0a92e"
+  },
+  "limit": null,
+  "manifest_version": "0.1.0",
+  "max_output_tokens": 260,
+  "minimum_confidence": 0.6,
+  "output_jsonl": "/Users/dipeshtripathi/Desktop/projects/Preference_Intelligence/research/data/pilot-llama3.2-1b-20260913.jsonl",
+  "persona_ids": [
+    "p01_engineer_finance_novice"
+  ],
+  "platform": "macOS-26.5-arm64-arm-64bit-Mach-O",
+  "python_version": "3.14.7",
+  "random_seed": 20260913,
+  "reasoning_effort": "none",
+  "replicates": 2,
+  "requested_model": "llama3.2:1b",
+  "requested_provider": "local",
+  "runner_version": "0.1.0",
+  "secrets_logged": false,
+  "shuffle_cells": true,
+  "split": null,
+  "task_ids": [
+    "se_java_virtual_threads_01",
+    "se_kafka_rebalance_01",
+    "finance_duration_01",
+    "finance_diversification_01"
+  ],
+  "temperature": 0.3
+}

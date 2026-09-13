@@ -1,0 +1,25 @@
+.demo-shell { max-width: 1240px; }
+.demo-hero { padding-top: 1rem; }
+.demo-hero h1 { max-width: none; }
+.demo-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 1rem; }
+.demo-grid .panel { margin: 0; }
+.field { display: block; margin-top: 1.1rem; font-size: .73rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 760; color: #68736d; }
+.field textarea { display: block; width: 100%; resize: vertical; margin-top: .35rem; border: 1px solid #cdd2cd; border-radius: .55rem; background: #fff; color: #1c2521; padding: .8rem; line-height: 1.5; }
+.prompt-actions { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: .9rem; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.microcopy { color: #747e79; font-size: .78rem; line-height: 1.45; }
+.classification { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
+.classification span { border: 1px solid #cad6ce; color: #315b49; background: #edf5f0; border-radius: 999px; padding: .34rem .55rem; font-size: .7rem; font-weight: 700; }
+.decision-list { display: grid; gap: .5rem; }
+.decision { border-left: 3px solid #39785f; padding: .7rem .8rem; background: #f4f7f3; border-radius: 0 .55rem .55rem 0; }
+.decision.overridden { border-left-color: #b77927; background: #fbf5e9; }
+.decision strong { font-size: .83rem; }
+.decision > span { float: right; font-size: .62rem; text-transform: uppercase; letter-spacing: .05em; color: #65726b; }
+.decision p { margin: .35rem 0 0; color: #65706a; font-size: .73rem; }
+.compiled-output { margin-top: 1rem; border-top: 1px solid #dfe5df; padding-top: .8rem; }
+.compiled-output summary { cursor: pointer; color: #3c574b; font-size: .75rem; font-weight: 750; }
+.compiled-output pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #1e2924; color: #e5f1e9; border-radius: .65rem; padding: .9rem; max-height: 310px; overflow: auto; font: .72rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.compact-empty { margin-top: 1rem; }
+.demo-footer { color: #66706b; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; font-size: .8rem; line-height: 1.5; padding: 1rem .25rem 0; }
+.demo-footer strong { color: #284036; }
+@media (max-width: 860px) { .demo-grid, .demo-footer { grid-template-columns: 1fr; }.decision-panel { min-height: 0; } }

@@ -1,0 +1,17 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This work frames response personalization as a portable, contextual, transparent,
+and user-governed policy-selection problem rather than undifferentiated long-term
+memory. It contributes a typed representation, behavioral-conformance definition,
+benchmark, executable five-condition harness, local-first product, and blinded
+human-evaluation path.
+
+Across 128 real generations from two local model families, the same profile and
+selection pipeline executed without failures. A compact compiler saved 19 input
+tokens per prompt relative to a short history baseline, but produced about 99 more
+output tokens and added 3.12 seconds of latency; its exploratory reference coverage
+was not distinguishable in this small sample. Thus the measured contribution is
+an auditable systems artifact and a falsifiable efficiency trade-off, not evidence
+that personalization improves subjective quality. Establishing that claim requires
+the preregistered target-user study and independent correctness evaluation.

@@ -1,0 +1,17 @@
+\section{Dynamic Preference Learning}
+\label{sec:learning}
+
+The proposed updater aggregates signed, timestamped evidence by dimension and
+scope. Explicit dashboard changes and direct statements have greater authority
+than repeated implicit corrections; one ambiguous event cannot create a durable
+high-confidence preference. Contradictory evidence lowers certainty or maintains
+multiple scoped hypotheses rather than silently applying last-write-wins.
+
+Recency decay is applied to inferential evidence, while user-locked preferences do
+not decay. Temporary, task-local requests affect the current generation but are
+not promoted to durable profile values without an explicit persistence cue. Drift
+is evaluated through stable change points, temporary overrides, and alternating
+task-dependent preferences.
+
+\evidencegap{Learning curves, activation precision/recall, calibration, and
+adaptation-delay estimates require the frozen longitudinal experiments.}

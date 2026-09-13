@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Preference Intelligence",
+  "description": "A local-first, transparent preference layer for the AI tools you use.",
+  "version": "0.1.0",
+  "permissions": [],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Preference Intelligence",
+    "default_popup": "popup.html"
+  },
+  "options_page": "index.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

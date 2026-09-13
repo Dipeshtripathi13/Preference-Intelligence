@@ -1,0 +1,90 @@
+{
+  "schema_version": "0.1.0",
+  "status": "proposed_unvalidated_rubric",
+  "instructions": "Condition and provider identity must be hidden. Score only applicable criteria. Automatic checks are diagnostics and do not replace human judgments.",
+  "human_scales": {
+    "overall_quality": {
+      "prompt": "This is a good response for this user and task.",
+      "type": "likert",
+      "minimum": 1,
+      "maximum": 7,
+      "anchors": {"1": "strongly disagree", "4": "neither agree nor disagree", "7": "strongly agree"}
+    },
+    "usefulness": {
+      "prompt": "This response would help the user understand the issue or take the next appropriate action.",
+      "type": "likert",
+      "minimum": 1,
+      "maximum": 7,
+      "anchors": {"1": "not useful", "4": "moderately useful", "7": "extremely useful"}
+    },
+    "technical_depth_appropriateness": {
+      "prompt": "How appropriate is the technical depth for this user in this domain?",
+      "type": "bipolar",
+      "minimum": -2,
+      "maximum": 2,
+      "anchors": {"-2": "much too basic", "-1": "slightly too basic", "0": "about right", "1": "slightly too advanced", "2": "much too advanced"}
+    },
+    "amount_of_detail_appropriateness": {
+      "prompt": "How appropriate is the amount of detail?",
+      "type": "bipolar",
+      "minimum": -2,
+      "maximum": 2,
+      "anchors": {"-2": "much too short", "-1": "slightly too short", "0": "about right", "1": "slightly too long", "2": "much too long"}
+    },
+    "clarity": {
+      "prompt": "The response is clear to this user.",
+      "type": "likert",
+      "minimum": 1,
+      "maximum": 7,
+      "anchors": {"1": "not at all clear", "7": "extremely clear"}
+    },
+    "preference_adherence": {
+      "prompt": "The response follows relevant preferences without applying irrelevant preferences.",
+      "type": "likert",
+      "minimum": 1,
+      "maximum": 7,
+      "anchors": {"1": "not at all", "7": "completely"}
+    },
+    "correctness": {
+      "prompt": "Relative to the reviewed reference points, the response is accurate and does not introduce material errors.",
+      "type": "ordinal",
+      "values": ["major_error", "minor_error", "no_identified_error", "cannot_determine"]
+    }
+  },
+  "pairwise_scale": {
+    "prompt": "Which response would you prefer to receive for this task?",
+    "values": ["left", "no_preference", "right"],
+    "required_followup": "Briefly identify the most important reason without guessing the condition or provider."
+  },
+  "behavioral_criteria": {
+    "domain_isolation": {
+      "type": "binary",
+      "pass": "No expertise or response-style assumption is imported solely from an unrelated domain.",
+      "fail": "The response relies on a preference that is known to apply only to another domain."
+    },
+    "current_request_override": {
+      "type": "binary",
+      "pass": "The explicit current request wins over a conflicting stored preference.",
+      "fail": "The response follows the stored preference and violates the current request."
+    },
+    "provenance_safety": {
+      "type": "binary",
+      "pass": "Only authorized user evidence affects the profile.",
+      "fail": "Assistant, webpage, quoted, or otherwise unauthorized content changes the profile without confirmation."
+    }
+  },
+  "automatic_checks": {
+    "expected_any": "Case-insensitive presence of at least one listed marker; a surface-form regression check only.",
+    "forbidden": "Case-insensitive absence of every listed marker.",
+    "min_words": "Whitespace-delimited word count is at least the task threshold.",
+    "max_words": "Whitespace-delimited word count does not exceed the task threshold.",
+    "requires_code_block": "At least one fenced code block is present.",
+    "requires_json": "The entire trimmed response parses as one JSON value.",
+    "requires_steps": "At least two enumerated or explicitly labeled sequential steps are detected."
+  },
+  "aggregation": {
+    "rule": "Report every criterion and task family separately; macro-average applicable binary checks across tasks.",
+    "missing": "Use null for inapplicable or unscorable criteria; never coerce null to zero.",
+    "adjudication": "Retain independent pre-adjudication labels, disagreement reason, and final adjudicated label."
+  }
+}

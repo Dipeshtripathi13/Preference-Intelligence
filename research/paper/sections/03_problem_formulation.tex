@@ -1,0 +1,29 @@
+\section{Problem Formulation}
+\label{sec:formulation}
+
+Let $u$ denote a user, $x$ a current request, $d$ its domain, $t$ its task type,
+$m$ a model provider/snapshot, and $P_u$ the portable preference profile. A
+selector $S(P_u,d,t,x)$ returns a bounded set of relevant preference records,
+while compiler $C$ maps those records to an instruction context $c$. Generation
+is
+\begin{equation}
+  y \sim p_m\!\left(y \mid x, C(S(P_u,d,t,x))\right).
+\end{equation}
+The current request is a hard precedence constraint: if $x$ conflicts with a
+stored default, $x$ wins. Selection is therefore not merely nearest-neighbor
+retrieval; it combines scope compatibility, evidence authority, confidence,
+recency, locks, and conflict resolution.
+
+For subjective utility $Q(u,x,y)$, the primary estimand is the average
+within-user contrast between domain-dynamic personalization and no
+personalization over a prespecified population of users, tasks, and model
+families. Portability additionally requires that $P_u$ is unchanged across $m$;
+thin message-format adapters do not count as model-specific preference storage.
+We therefore distinguish \emph{syntactic portability} (the profile can be parsed
+and compiled for a new model) from \emph{behavioral conformance} (the resulting
+response satisfies the same applicable policy without increasing correctness,
+safety, privacy, or cost failures beyond a prespecified margin).
+
+The design treats correctness, safety, privacy exposure, context cost, and
+preference adherence as distinct outcomes. A system that increases stylistic
+adherence while decreasing correctness does not unconditionally improve quality.

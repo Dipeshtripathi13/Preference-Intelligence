@@ -1,0 +1,47 @@
+\section{Experimental Setup}
+\label{sec:setup}
+
+We predefine five conditions: no personalization (A), a participant-authored
+static global profile (B), retrieval of relevant user-authored history (C), a
+dynamic global structured profile (D), and a dynamic domain-conditioned profile
+(E). Generation settings and neutral task instructions are held fixed within a
+comparison. Equal personalization-token budgets support the primary quality
+comparison; natural budgets support the efficiency comparison.
+
+The synthetic benchmark contains multidomain personas, development and locked
+task-template families, explicit conflicts, invalid evidence, and preference
+drift. The proposed human evaluation is a randomized, blinded,
+repeated-measures incomplete block with participant and task effects. The primary
+outcome is pairwise E-versus-A preference with ties retained. Secondary outcomes
+include usefulness, clarity, depth/detail appropriateness, adherence, context
+tokens, latency, domain leakage, and incorrect activation.
+
+\paragraph{Reproducibility.} Every generation record includes the condition,
+provider and returned model identifiers, parameters, full prompts, selected
+preference records, compiled context, token usage or labeled approximation,
+latency, response, automatic diagnostics, error, timestamp, and seed. Run
+manifests contain input hashes and the code revision when available.
+
+\paragraph{Executed local-model pilot.} We instantiated one synthetic persona with
+advanced software-engineering and beginner-finance preferences and selected four
+tasks: Java virtual threads, Kafka rebalancing, bond duration, and portfolio
+diversification. Qwen~3 8B Q4\_K\_M and Llama~3.2 1B Q8\_0 were served through a
+local Ollama endpoint. We disabled hidden reasoning to reserve a comparable
+260-token visible-output budget, set temperature to 0.3, generated two stochastic
+replicates per cell, and deterministically shuffled cells using recorded seeds.
+The first run crossed both models with all five conditions ($80$ generations;
+seed 20260913). After observing excess structured-prompt overhead, we retained
+that run and executed a labeled post-hoc compiler ablation over A, C, and E
+($48$ generations; seed 20260914). No failed cells were discarded.
+
+\paragraph{Pilot analysis.} A narrow reference-concept coverage diagnostic was
+derived after generation from factual reference points already present in the
+benchmark. It can miss valid paraphrases and is not a factuality or preference
+metric. We report paired differences and exploratory percentile intervals from
+5,000 cluster-bootstrap draws over eight model--task clusters. Because the metric
+and compact ablation were post-hoc, we report no confirmatory $p$-values.
+
+\paragraph{Human-study status.} No participants have been recruited and no human
+ratings are available. Exact hosted-provider snapshots, participant count, and
+smallest effect of interest must be frozen in a preregistration and approved study
+protocol before confirmatory collection.

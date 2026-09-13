@@ -1,0 +1,37 @@
+\section{Related Work}
+\label{sec:related}
+
+The relevant literature spans personalized language generation, user modeling,
+implicit feedback, adaptive interfaces, recommender systems, conversational
+memory, persona conditioning, and preference optimization. Context-aware
+recommender systems and implicit-feedback methods established that behavior is
+not equivalent to positive preference and that context belongs in the utility
+model \citep{hu-etal-2008-collaborative,adomavicius-2011-context-aware}.
+
+Recent LLM personalization work has moved beyond fixed persona sentences. LaMP
+established retrieval-based personalization tasks
+\citep{salemi-etal-2024-lamp}; other systems use per-user adapters or embeddings
+\citep{tan-etal-2024-democratizing,liu-etal-2025-llms}, domain-aware compressed
+profiles \citep{su-etal-2025-personalized}, and latent preference attributes
+\citep{li-etal-2025-prefpalette}. PLUS jointly learns an interpretable natural-
+language summary and a personalized reward model \citep{nam-etal-2026-plus}, while
+S2Pref distinguishes stable from situational preferences and includes preference
+conflicts \citep{gao-etal-2026-beyond}. These results mean that dynamic profiles,
+domain conditioning, and interpretable summaries are not individually novel.
+
+Evaluation work also warns against assuming that personalization helps. PrefEval
+tests explicit and implicit preference following in long contexts
+\citep{zhao-etal-2025-prefeval}, and PrefDisco reports settings where uninformed
+personalization underperforms a generic response \citep{li-etal-2026-prefdisco}.
+Broad memory systems offer temporal retrieval and compression mechanisms
+\citep{park-etal-2023-generative,packer-etal-2023-memgpt,chhikara-etal-2025-mem0}
+but usually optimize episodic or factual recall rather than an editable response-
+preference policy.
+
+The narrower gap investigated here is the joint system of typed response
+dimensions, hierarchical applicability, calibrated evidence provenance, user
+governance, provider-neutral compilation, and behavioral cross-model evaluation.
+The structured literature review found no peer-reviewed demonstration of the
+entire bundle at its evidence cutoff; this is an absence-of-evidence statement,
+not a priority claim. The review protocol and study selection limitations are
+reported in the accompanying artifact.
