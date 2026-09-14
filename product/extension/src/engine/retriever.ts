@@ -65,7 +65,8 @@ function allowedByCondition(record: PreferenceRecord, condition: ExperimentCondi
     case 'no_personalization':
       return false;
     case 'static_profile':
-      return record.sourceType === 'user_edit' || record.sourceType === 'profile_import';
+      return record.sourceType === 'onboarding_declaration'
+        || record.sourceType === 'user_edit' || record.sourceType === 'profile_import';
     case 'global_learned':
       return !record.scope.domain;
     case 'domain_conditioned':
@@ -90,7 +91,18 @@ export class PreferenceRetriever {
 
     for (const record of records) {
       const confidence = effectiveConfidence(record, now);
-      const assessment = this.applicability.evaluate(record, context, confidence);
+      const isGlobalV1Candidate = condition === 'global_learned'
+        && !record.scope.domain && !record.scope.subdomain && !record.scope.task;
+      const assessment = isGlobalV1Candidate
+        ? {
+            scopeMatch: 1,
+            semanticRelevance: 1,
+            evidenceConfidence: confidence,
+            applicability: 1,
+            applicable: true,
+            reason: 'Global v1 preference; no domain classifier was used.',
+          }
+        : this.applicability.evaluate(record, context, confidence);
       const scores = {
         scopeMatch: assessment.scopeMatch,
         semanticRelevance: assessment.semanticRelevance,

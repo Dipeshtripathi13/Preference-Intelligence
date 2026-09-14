@@ -1,6 +1,7 @@
 import type { CompiledContext } from '../engine/types';
 
 const HOST_ID = 'preference-intelligence-indicator';
+const DRAFT_HOST_ID = 'preference-intelligence-draft-indicator';
 
 function label(value: string): string {
   return value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -111,6 +112,46 @@ export function showPreferenceIndicator(
     toggle.setAttribute('aria-expanded', String(wrapper.classList.contains('open')));
   });
   wrapper.append(toggle, panel);
+  shadow.append(style, wrapper);
+  return host;
+}
+
+export function removePreferenceDraftIndicator(root: Document = document): void {
+  root.getElementById(DRAFT_HOST_ID)?.remove();
+}
+
+/** Shows review instructions while the compiled block remains visible in the composer. */
+export function showPreferenceDraftIndicator(
+  compiled: CompiledContext,
+  onDismiss: () => void,
+  root: Document = document,
+): HTMLElement {
+  removePreferenceDraftIndicator(root);
+  const host = root.createElement('div');
+  host.id = DRAFT_HOST_ID;
+  root.documentElement.append(host);
+  const shadow = host.attachShadow({ mode: 'open' });
+  const style = root.createElement('style');
+  style.textContent = `
+    :host { all: initial; }
+    .draft { position: fixed; right: 18px; bottom: 18px; z-index: 2147483647; width: 310px; padding: 13px; border: 1px solid #b9c9bf; border-radius: 12px; background: #f8fbf9; color: #17231e; box-shadow: 0 12px 38px rgba(20,40,31,.22); font: 12px/1.45 ui-sans-serif, system-ui, sans-serif; }
+    strong { display: block; font-size: 13px; margin-bottom: 4px; }
+    p { margin: 4px 0 10px; color: #5e6c65; }
+    code { font-size: 10px; background: #e7eee9; padding: 2px 4px; border-radius: 4px; }
+    button { border: 1px solid #d5bcb5; border-radius: 7px; background: white; color: #8b4637; padding: 6px 8px; cursor: pointer; font: 700 10px/1 ui-sans-serif, system-ui, sans-serif; }
+  `;
+  const wrapper = root.createElement('div');
+  wrapper.className = 'draft';
+  const heading = root.createElement('strong');
+  heading.textContent = `${compiled.selected.length} preference${compiled.selected.length === 1 ? '' : 's'} added for review`;
+  const instructions = root.createElement('p');
+  instructions.append('Edit the visible block if needed. Press Enter or Send again to continue. Press ', root.createElement('code'), ' to remove it.');
+  instructions.querySelector('code')!.textContent = 'Esc';
+  const dismiss = root.createElement('button');
+  dismiss.type = 'button';
+  dismiss.textContent = 'Remove preferences';
+  dismiss.addEventListener('click', onDismiss);
+  wrapper.append(heading, instructions, dismiss);
   shadow.append(style, wrapper);
   return host;
 }

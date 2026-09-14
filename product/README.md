@@ -2,19 +2,22 @@
 
 **Your preferences. Every AI.**
 
-This directory contains a local-first Chrome/Chromium extension that demonstrates a provider-independent preference layer. It learns a bounded set of response preferences from trusted, user-authored corrections; selects only preferences relevant to the current domain and task; and compiles compact guidance for ChatGPT or Claude. The profile remains inspectable and editable in the extension dashboard.
+This directory contains a local-first Chrome/Chromium extension and reusable engine package. The v1 product starts from skippable paired-answer onboarding, learns a bounded set of global response preferences from trusted user corrections, and exposes the compiled instruction for review before ChatGPT or Claude receives it. The profile remains inspectable and editable in the extension dashboard.
 
 This is a research prototype. The implementation demonstrates the mechanism; it does not establish that personalization improves response quality.
 
 ## What works
 
-- Deterministic domain/subdomain and task classification
-- Multi-domain candidates plus fixed-income and infrastructure classification rules
-- Global, domain, subdomain, and task-scoped retrieval through a distinct applicability evaluator
+- Global-first v1 retrieval with domain classification removed from the default decision path
+- Optional contextual types and an experimental v2 research path retained without affecting v1
+- Six-screen, fully skippable paired-answer onboarding and bounded custom-instruction import
+- Setup declarations at 50% confidence with plain-language provenance
+- Visible, editable injection that requires a second deliberate send and supports Escape removal
 - Inspectable scope match, semantic relevance, evidence confidence, final applicability, and suppression decisions
 - Named evidence hierarchy, gradual repeated-correction updates, decay, direct-statement precedence, and conflict abstention
 - Current-request precedence over every stored preference
-- ChatGPT and Claude adapters behind a common provider interface
+- ChatGPT and Claude adapters behind a common provider interface and reviewed selector data file
+- Publishable DOM-free `@preference-intelligence/engine` package
 - Background-owned IndexedDB profile and bounded decision log
 - Dashboard controls to inspect, add, edit, confirm, lock, disable, delete, reset, and review applied/rejected traces
 - Small in-provider “Using N preferences” indicator with context-specific “wasn't relevant here” feedback
@@ -25,7 +28,7 @@ This is a research prototype. The implementation demonstrates the mechanism; it 
 - Internal conditions for no personalization, static profile, global learned profile, and domain-conditioned profile
 - Opt-in raw-prompt experiment logging; off by default
 
-Gemini has an adapter placeholder but is intentionally absent from the manifest until its selectors and end-to-end behavior are validated.
+Gemini has an adapter placeholder but is intentionally absent from the manifest. New providers, non-English signals, response reading, telemetry, cloud sync, and LLM API calls are out of v1 scope.
 
 ## Development
 
@@ -68,6 +71,7 @@ provider validation follows [`EXTENSION_MANUAL_TEST.md`](docs/EXTENSION_MANUAL_T
 ```text
 product/
 ├── docs/                  # Architecture, threat model, and ADRs
+├── preference-engine/     # DOM-free npm package build
 ├── extension/
 │   ├── public/manifest.json
 │   ├── src/background.ts  # Trusted store and message boundary
@@ -82,8 +86,8 @@ product/
 ## Known limitations
 
 - Provider integration is selector-based and requires periodic compatibility checks.
-- The rules-based classifier and extractor are deliberately conservative and English-only.
-- Multi-domain alternatives are visible, but the MVP selects one primary domain for preference application.
+- The rules-based extractor is deliberately conservative and English-only.
+- Contextual classification is deferred to v2; v1 preferences are global.
 - Evidence and applicability scores are engineering priors, not calibrated probabilities.
 - A browser extension cannot defend its local database from a fully compromised browser profile or device.
 - Profile merge protects same-ID locked records; semantic duplicate reconciliation remains future work.

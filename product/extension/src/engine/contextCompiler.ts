@@ -5,7 +5,7 @@ const INSTRUCTION_TEMPLATES: Record<string, Record<string, string>> = {
   verbosity: { concise: 'Keep the response concise.', medium: 'Use moderate detail.', detailed: 'Give a detailed response.' },
   technical_depth: { beginner: 'Use beginner-level technical depth.', intermediate: 'Use intermediate technical depth.', advanced: 'Use advanced technical depth; skip basic concepts.' },
   explanation_level: { minimal: 'Minimize explanatory background.', foundational: 'Include necessary foundations.', thorough: 'Explain reasoning thoroughly.' },
-  code_preference: { avoid: 'Avoid code unless essential.', when_useful: 'Include code when useful.', preferred: 'Prefer concrete code.' },
+  code_preference: { avoid: 'Avoid code unless essential.', when_useful: 'Include code when useful.', preferred: 'When code is relevant, prefer concrete code.' },
   example_preference: { avoid: 'Avoid examples unless essential.', when_useful: 'Use examples when useful.', preferred: 'Include concrete examples.' },
   analogy_preference: { avoid: 'Avoid analogies.', when_useful: 'Use an analogy only when it clarifies.', preferred: 'Use helpful analogies.' },
   format_preference: { prose: 'Prefer connected prose.', bullets: 'Prefer concise bullet points.', structured: 'Use clear headings and structure.' },

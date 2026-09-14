@@ -58,7 +58,6 @@
         "preference_id",
         "dimension",
         "value",
-        "scope",
         "confidence",
         "state",
         "source_type",
@@ -90,7 +89,7 @@
         "scope": { "$ref": "#/$defs/scope" },
         "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
         "state": { "enum": ["inferred", "confirmed", "locked", "suppressed", "ambiguous"] },
-        "source_type": { "enum": ["dashboard_edit", "user_explicit", "user_correction", "user_implicit", "imported", "experiment"] },
+        "source_type": { "enum": ["onboarding_declaration", "dashboard_edit", "user_explicit", "user_correction", "user_implicit", "imported", "experiment"] },
         "evidence_count": { "type": "integer", "minimum": 0 },
         "independent_interaction_count": { "type": "integer", "minimum": 0, "default": 0 },
         "created_at": { "type": "string", "format": "date-time" },
@@ -121,7 +120,7 @@
               "polarity": { "enum": ["positive", "negative"] },
               "explicitness": { "enum": ["explicit", "correction", "implicit"] },
               "strength": { "type": "number", "minimum": 0, "maximum": 1 },
-              "source_type": { "enum": ["dashboard_edit", "user_explicit", "user_correction", "user_implicit", "imported", "experiment"] },
+              "source_type": { "enum": ["onboarding_declaration", "dashboard_edit", "user_explicit", "user_correction", "user_implicit", "imported", "experiment"] },
               "signal_label": { "type": ["string", "null"], "maxLength": 120 },
               "raw_excerpt": { "type": ["string", "null"], "maxLength": 500, "default": null },
               "observed_at": { "type": "string", "format": "date-time" },
@@ -131,7 +130,7 @@
                 "additionalProperties": false,
                 "required": ["mechanism", "provider", "trusted_user_surface"],
                 "properties": {
-                  "mechanism": { "enum": ["dashboard", "provider_composer", "profile_import", "synthetic_experiment"] },
+                  "mechanism": { "enum": ["onboarding", "dashboard", "provider_composer", "profile_import", "synthetic_experiment"] },
                   "provider": { "type": ["string", "null"], "maxLength": 80 },
                   "trusted_user_surface": { "const": true }
                 }

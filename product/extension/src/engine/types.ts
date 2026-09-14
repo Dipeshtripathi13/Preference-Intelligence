@@ -61,12 +61,13 @@ export const VALUES_BY_DIMENSION: Record<PreferenceDimension, readonly string[]>
 export type PreferenceSource =
   | 'explicit_feedback'
   | 'implicit_feedback'
+  | 'onboarding_declaration'
   | 'user_edit'
   | 'profile_import';
 
 export type PreferenceState = 'inferred' | 'confirmed' | 'locked' | 'suppressed' | 'ambiguous';
 
-export type TrustedOrigin = 'user_composer' | 'dashboard' | 'profile_import';
+export type TrustedOrigin = 'user_composer' | 'onboarding' | 'dashboard' | 'profile_import';
 export type UntrustedOrigin = 'assistant_message' | 'webpage_content';
 
 export interface Scope {
@@ -90,8 +91,21 @@ export type EvidenceKind =
   | 'direct_correction'
   | 'repeated_correction'
   | 'interaction_pattern'
+  | 'onboarding_choice'
+  | 'onboarding_import'
   | 'dashboard_edit'
   | 'imported';
+
+export const PRIMARY_USE_AREAS = [
+  'code',
+  'writing',
+  'research',
+  'finance',
+  'study',
+  'work_comms',
+] as const;
+
+export type PrimaryUseArea = (typeof PRIMARY_USE_AREAS)[number];
 
 export type PreferenceLifetime = 'current_request' | 'session' | 'temporary' | 'durable' | 'locked';
 
@@ -234,6 +248,8 @@ export type ExperimentCondition =
 export interface ProductSettings {
   learningEnabled: boolean;
   personalizationEnabled: boolean;
+  onboardingCompleted: boolean;
+  primaryUseAreas: PrimaryUseArea[];
   disabledDomains: Domain[];
   experimentalMode: boolean;
   experimentCondition: ExperimentCondition;
@@ -256,9 +272,11 @@ export interface UsageLog {
 export const DEFAULT_SETTINGS: ProductSettings = {
   learningEnabled: true,
   personalizationEnabled: true,
+  onboardingCompleted: false,
+  primaryUseAreas: [],
   disabledDomains: [],
   experimentalMode: false,
-  experimentCondition: 'domain_conditioned',
+  experimentCondition: 'global_learned',
   recordRawPrompts: false,
 };
 

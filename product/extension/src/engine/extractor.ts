@@ -2,7 +2,6 @@ import type {
   ExtractionInput,
   PreferenceDimension,
   PreferenceEvidence,
-  Scope,
 } from './types';
 
 interface SignalRule {
@@ -39,16 +38,6 @@ const SIGNAL_RULES: readonly SignalRule[] = [
   { dimension: 'answer_first_preference', value: 'answer_first', signal: 'asks_for_answer_first', strength: 0.9, patterns: [/\b(answer|recommendation|bottom line) first\b/i] },
 ];
 
-function inferredScope(input: ExtractionInput): Scope {
-  const saysGlobal = /\b(always|in general|by default|from now on)\b/i.test(input.text);
-  if (saysGlobal && input.context.domain === 'general') return {};
-
-  return {
-    domain: input.context.domain === 'general' ? undefined : input.context.domain,
-    subdomain: input.context.subdomain,
-  };
-}
-
 export class PreferenceExtractor {
   extract(input: ExtractionInput): PreferenceEvidence[] {
     if (!input.isTrustedUserAction || input.origin !== 'user_composer') return [];
@@ -59,7 +48,10 @@ export class PreferenceExtractor {
       return [];
     }
 
-    const scope = inferredScope(input);
+    // V1 is intentionally global-first. Keeping the scope object in every
+    // record lets a later contextual release add domain scope without a data
+    // migration, while avoiding silent classifier mistakes today.
+    const scope = {};
     const hasDurableLanguage = /\b(always|usually|in general|by default|from now on|I prefer|never|don't ever|do not ever)\b/i.test(input.text);
     return SIGNAL_RULES.filter((rule) =>
       rule.patterns.some((pattern) => pattern.test(input.text)) && (hasDurableLanguage || rule.learnAsCorrection),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { IndexedDbPreferenceStore } from '../src/engine/store';
+import { IndexedDbPreferenceStore } from '../src/storage/indexedDbPreferenceStore';
 import { preference } from './helpers';
 
 describe('IndexedDbPreferenceStore', () => {

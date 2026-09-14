@@ -55,6 +55,31 @@ describe('portable profile', () => {
     expect(parsed.records[0]).toMatchObject({ lifetime: 'temporary', expiresAt: '2026-09-20T12:00:00.000Z' });
   });
 
+  it('exports onboarding provenance and accepts an omitted v1 scope', async () => {
+    const store = new MemoryPreferenceStore();
+    await store.putPreference(preference('verbosity', 'concise', {}, {
+      confidence: 0.5,
+      evidenceCount: 1,
+      state: 'inferred',
+      sourceType: 'onboarding_declaration',
+      provenance: [{
+        id: 'onboarding-evidence',
+        sourceType: 'onboarding_declaration',
+        origin: 'onboarding',
+        observedAt: '2026-09-14T12:00:00.000Z',
+        signal: 'onboarding_chose_concise',
+        evidenceKind: 'onboarding_choice',
+      }],
+    }));
+    const profile = await exportProfile(store);
+    expect(profile.preferences[0].source_type).toBe('onboarding_declaration');
+    expect(profile.preferences[0].evidence[0].capture.mechanism).toBe('onboarding');
+    delete profile.preferences[0].scope;
+    expect(parseProfile(profile).records[0].scope).toEqual({
+      domain: undefined, subdomain: undefined, task: undefined,
+    });
+  });
+
   it('round-trips context-specific negative applicability evidence', async () => {
     const source = new MemoryPreferenceStore();
     const record = preference('verbosity', 'concise', {}, {

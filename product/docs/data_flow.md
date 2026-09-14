@@ -5,14 +5,14 @@
 1. A real user input event updates a composer-only trusted snapshot.
 2. A trusted click or Enter submission is intercepted once.
 3. The adapter reads the current composer. Equality with the trusted snapshot determines learning eligibility.
-4. The service worker classifies the original prompt.
-5. If learning is enabled and the action is trusted, the extractor emits bounded user-authored evidence and the updater stores it.
-6. The retriever evaluates every bounded record for enablement, condition, expiry, conflict, scope, evidence threshold, and user-authored applicability exceptions.
-7. The applicability evaluator separately scores scope match, semantic/task relevance, and effective evidence confidence. Ranking cannot rescue an inapplicable preference.
-8. The ranker selects at most eight dimensions; the compiler suppresses dimensions explicitly overridden in the current request.
-9. Applied and suppressed metadata decisions plus any update events are stored locally for explanation.
-10. The content script writes `compiled preferences → authoritative current request`, activates the provider's submit control, and shows a small applied-count indicator.
-11. The chosen provider receives the composed prompt. Preference Intelligence does not observe the response.
+4. The service worker uses the global v1 policy; no domain classifier participates.
+5. If learning is enabled and the action is trusted, the extractor emits bounded global user-authored evidence and the updater stores it.
+6. The retriever evaluates every global record for enablement, expiry, conflict, and evidence threshold.
+7. The ranker selects at most eight dimensions; the compiler suppresses dimensions explicitly overridden in the current request.
+8. Applied and suppressed metadata decisions plus any update events are stored locally for explanation.
+9. The content script writes `compiled preferences → authoritative current request` into the composer and stops.
+10. The user can edit the visible block, submit it again, or press Escape to remove it.
+11. Only the second deliberate submit reaches the provider. Preference Intelligence does not observe the response.
 
 On any internal error, the content script restores the original prompt and attempts a normal provider submission. A processing guard ignores synthetic submit clicks created by the adapter.
 
@@ -21,21 +21,13 @@ On any internal error, the content script restores the original prompt and attem
 ```text
 trusted composer text
   → conservative signal rule
-  → {dimension, bounded value, classified scope, strength, signal label}
+  → {dimension, bounded value, global scope, strength, signal label}
   → lock check
   → confidence/conflict update
   → IndexedDB record
 ```
 
-Assistant text, rendered page text, network responses, and DOM elements outside the composer have no extraction path. A brief correction such as “make it shorter” may use the preceding in-tab classification hint; ordinary general prompts do not inherit the hint.
-
-## Correcting applicability
-
-Choosing “Wasn't relevant here” from the in-page indicator sends the preference ID
-and current classification—not the raw prompt—to the trusted service worker. The
-worker retains the preference, adds a scoped `notApplicableTo` exception, and
-records bounded negative evidence. Export maps that correction into the existing
-canonical evidence array so it can be imported on another device.
+Assistant text, rendered page text, network responses, and DOM elements outside the composer have no extraction path. All v1 evidence is global. Context hints are used only inside an explicitly enabled contextual research condition.
 
 ## Dashboard operations
 
@@ -43,7 +35,6 @@ canonical evidence array so it can be imported on another device.
 - Lock: automatic evidence can no longer modify the record.
 - Disable: retains a suppressed active record for later re-enable but excludes it from retrieval.
 - Delete: removes the record and its compact provenance.
-- Disable domain: prevents every record from compiling in that top-level domain.
 - Reset: clears preferences and usage logs after an explicit confirmation.
 
 ## Import/export
@@ -52,7 +43,7 @@ Export maps internal camelCase fields into the canonical `0.1.0` snake_case sche
 
 ## Experimental mode
 
-The default condition is domain-conditioned personalization. Developer mode can select:
+The default product condition is `global_learned`. Developer mode can select research conditions:
 
 - `no_personalization`
 - `static_profile` (dashboard edits and imported records)

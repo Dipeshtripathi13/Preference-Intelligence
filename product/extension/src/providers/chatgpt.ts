@@ -6,9 +6,9 @@ import {
   writeEditable,
   type ProviderAdapter,
 } from './base';
+import { PROVIDER_SELECTORS } from './selectors';
 
-const COMPOSERS = ['#prompt-textarea', 'textarea[data-testid="prompt-textarea"]', 'div.ProseMirror[contenteditable="true"]'];
-const SUBMIT = ['button[data-testid="send-button"]', 'button[aria-label="Send prompt"]', 'button[aria-label="Send message"]'];
+const { composers: COMPOSERS, submit: SUBMIT } = PROVIDER_SELECTORS.chatgpt;
 
 export class ChatGptAdapter implements ProviderAdapter {
   readonly id = 'chatgpt' as const;

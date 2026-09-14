@@ -1,19 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   DIMENSIONS,
-  DOMAINS,
   VALUES_BY_DIMENSION,
-  type Domain,
   type PreferenceDimension,
   type PreferenceRecord,
+  type PrimaryUseArea,
   type ProductSettings,
-  type Scope,
   type UsageDecision,
 } from '../engine/types';
+import type { OnboardingPreferenceInput } from '../engine/onboarding';
 import { sendExtensionMessage, type DashboardState, type ExtensionResponse } from '../messaging';
+import { Onboarding } from './Onboarding';
 
 function label(value: string): string {
   return value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function sourceDescription(preference: PreferenceRecord): string {
+  if (preference.sourceType === 'onboarding_declaration') return 'You chose this at setup';
+  if (preference.sourceType === 'implicit_feedback') {
+    const corrections = preference.provenance.filter(({ sourceType }) => sourceType === 'implicit_feedback').length;
+    return `Learned from ${corrections} correction${corrections === 1 ? '' : 's'}`;
+  }
+  if (preference.sourceType === 'explicit_feedback') return 'Learned from your explicit instruction';
+  if (preference.sourceType === 'user_edit') return 'Set by you in the dashboard';
+  return 'Imported from your portable profile';
 }
 
 async function requireOk(request: Parameters<typeof sendExtensionMessage>[0]): Promise<ExtensionResponse> {
@@ -87,7 +98,7 @@ function PreferenceCard({ preference, latestDecision, onChanged }: PreferenceCar
           <dl>
             <div><dt>Scope</dt><dd>{[preference.scope.domain, preference.scope.subdomain, preference.scope.task].filter((item): item is string => Boolean(item)).map(label).join(' / ') || 'Global'}</dd></div>
             <div><dt>Last observed</dt><dd>{new Date(preference.lastObservedAt).toLocaleString()}</dd></div>
-            <div><dt>Source</dt><dd>{label(preference.sourceType)}</dd></div>
+            <div><dt>Source</dt><dd>{sourceDescription(preference)}</dd></div>
             {latestDecision && <><div><dt>Scope match</dt><dd>{Math.round((latestDecision.scopeMatch ?? 0) * 100)}%</dd></div><div><dt>Semantic relevance</dt><dd>{Math.round((latestDecision.semanticRelevance ?? 0) * 100)}%</dd></div><div><dt>Final applicability</dt><dd>{Math.round((latestDecision.applicability ?? 0) * 100)}%</dd></div></>}
           </dl>
           {Boolean(preference.notApplicableTo?.length) && <button className="small" onClick={() => void save({ notApplicableTo: [] })}>Clear {preference.notApplicableTo!.length} applicability correction{preference.notApplicableTo!.length === 1 ? '' : 's'}</button>}
@@ -100,7 +111,6 @@ function PreferenceCard({ preference, latestDecision, onChanged }: PreferenceCar
 function NewPreference({ onCreated }: { onCreated: () => Promise<void> }) {
   const [dimension, setDimension] = useState<PreferenceDimension>('verbosity');
   const [value, setValue] = useState('concise');
-  const [domain, setDomain] = useState<Domain | 'global'>('global');
 
   function changeDimension(next: PreferenceDimension) {
     setDimension(next);
@@ -109,8 +119,7 @@ function NewPreference({ onCreated }: { onCreated: () => Promise<void> }) {
 
   async function create(event: React.FormEvent) {
     event.preventDefault();
-    const scope: Scope = domain === 'global' ? {} : { domain };
-    await requireOk({ type: 'SAVE_PREFERENCE', preference: { dimension, value, scope, locked: false, enabled: true } });
+    await requireOk({ type: 'SAVE_PREFERENCE', preference: { dimension, value, scope: {}, locked: false, enabled: true } });
     await onCreated();
   }
 
@@ -118,7 +127,7 @@ function NewPreference({ onCreated }: { onCreated: () => Promise<void> }) {
     <form className="new-preference" onSubmit={(event) => void create(event)}>
       <label>Dimension<select value={dimension} onChange={(event) => changeDimension(event.target.value as PreferenceDimension)}>{DIMENSIONS.map((item) => <option key={item} value={item}>{label(item)}</option>)}</select></label>
       <label>Value<select value={value} onChange={(event) => setValue(event.target.value)}>{VALUES_BY_DIMENSION[dimension].map((item) => <option key={item} value={item}>{label(item)}</option>)}</select></label>
-      <label>Scope<select value={domain} onChange={(event) => setDomain(event.target.value as Domain | 'global')}><option value="global">Global</option>{DOMAINS.filter((item) => item !== 'general').map((item) => <option key={item} value={item}>{label(item)}</option>)}</select></label>
+      <label>Scope<input value="Global (v1)" readOnly /></label>
       <button className="primary" type="submit">Add preference</button>
     </form>
   );
@@ -163,6 +172,12 @@ export default function App() {
     await refresh();
   }
 
+  async function completeOnboarding(preferences: OnboardingPreferenceInput[], primaryUseAreas: PrimaryUseArea[]) {
+    const response = await requireOk({ type: 'COMPLETE_ONBOARDING', preferences, primaryUseAreas });
+    if ('onboarded' in response) setNotice(`Setup saved ${response.onboarded} local preference${response.onboarded === 1 ? '' : 's'}.`);
+    await refresh();
+  }
+
   async function exportData() {
     const response = await requireOk({ type: 'EXPORT_PROFILE' });
     if (!('profile' in response)) return;
@@ -198,11 +213,12 @@ export default function App() {
   }
 
   if (!data && !error) return <main className="shell"><p>Loading local profile…</p></main>;
+  if (data && !data.settings.onboardingCompleted) return <Onboarding onComplete={completeOnboarding} />;
 
   return (
     <main className="shell">
       <header className="hero">
-        <div><p className="eyebrow">Preference Intelligence</p><h1>Your preferences. Every AI.</h1><p>Portable, contextual, and transparent response personalization—stored in this browser.</p></div>
+        <div><p className="eyebrow">Preference Intelligence</p><h1>Your preferences. Every AI.</h1><p>A readable, global response-style profile—stored in this browser, with no account or server.</p></div>
         <div className="privacy-badge"><span>●</span> Local profile</div>
       </header>
 
@@ -230,14 +246,6 @@ export default function App() {
             <div className="preference-grid">{preferences.map((preference) => <PreferenceCard key={preference.id} preference={preference} latestDecision={latestDecisions.get(preference.id)} onChanged={refresh} />)}</div>
           </div>
         ))}
-      </section>
-
-      <section className="panel">
-        <div className="section-title"><div><p className="eyebrow">Context control</p><h2>Disabled domains</h2></div></div>
-        <div className="domain-chips">{DOMAINS.filter((domain) => domain !== 'general').map((domain) => {
-          const disabled = data?.settings.disabledDomains.includes(domain) ?? false;
-          return <label className={disabled ? 'domain-chip disabled' : 'domain-chip'} key={domain}><input type="checkbox" checked={disabled} onChange={() => void updateSettings({ disabledDomains: disabled ? data!.settings.disabledDomains.filter((item) => item !== domain) : [...data!.settings.disabledDomains, domain] })} />{label(domain)}</label>;
-        })}</div>
       </section>
 
       <details className="panel experimental">

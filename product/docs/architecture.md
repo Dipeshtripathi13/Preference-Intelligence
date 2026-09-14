@@ -1,10 +1,10 @@
 # Product architecture
 
-Status: preliminary implementation architecture.
+Status: implemented global-first v1 architecture; contextual scope is deferred to v2.
 
 ## Design goals
 
-The MVP is local-first, portable across providers, contextual by scope, and transparent to its owner. Its durable representation describes how to respond rather than retaining a general conversation history. Provider adapters are replaceable; the preference engine has no provider-specific record fields.
+The MVP is local-first, portable across providers, and transparent to its owner. V1 uses global preferences to avoid silent domain-classifier errors. The optional scope representation remains for future v2 compatibility. Its durable representation describes how to respond rather than retaining a general conversation history.
 
 ## Components
 
@@ -13,7 +13,6 @@ Provider page
   └─ provider adapter + content boundary
        └─ typed runtime message (original user prompt, trust flag, provider)
             └─ extension service worker
-                 ├─ DomainClassifier
                  ├─ PreferenceExtractor → PreferenceUpdater
                  ├─ PreferenceRetriever → ApplicabilityEvaluator → PreferenceRanker
                  ├─ ContextCompiler
@@ -27,15 +26,15 @@ Dashboard / popup ── typed runtime messages ──┘
 
 ### Provider adapters
 
-`ProviderAdapter` contains only origin matching, composer discovery/read/write, submit-element recognition, and submission. ChatGPT and Claude implement it. Gemini is compiled as a placeholder but is not granted site access. No adapter reads assistant messages or conversation history. A small shadow-DOM indicator renders bounded compile decisions without receiving the complete profile.
+`ProviderAdapter` contains only origin matching, composer discovery/read/write, submit-element recognition, and submission. ChatGPT and Claude implement it. Selectors live in a reviewed packaged JSON data file. Gemini is compiled as a placeholder but is not granted site access. No adapter reads assistant messages or conversation history.
 
 ### Content boundary
 
-The content script observes trusted input events inside the active composer. At submit time it compares the current composer to its last trusted snapshot. A mismatch can still be personalized but cannot update the profile. The script sends the original request to the service worker, receives a compact instruction, places that block first, and leaves the authoritative user request verbatim last.
+The content script observes trusted input events inside the active composer. On the first submit it sends the original request to the service worker, receives a compact instruction, and leaves the visible draft in the composer for review. The user edits it, submits again, or presses Escape to restore the original prompt. Failures restore the original prompt and show no Preference Intelligence UI.
 
 ### Preference engine
 
-- `DomainClassifier`: conservative keyword taxonomy, independently replaceable.
+- `DomainClassifier`: retained only for explicit v2 research conditions; not used by the default v1 path.
 - `PreferenceExtractor`: bounded signals from trusted user-composer actions only.
 - `PreferenceUpdater`: evidence-confidence accumulation, explicit replacement, contradiction state, update events, and lock enforcement.
 - `PreferenceRetriever`: hierarchy matching, decay, experiment filtering, and complete bounded apply/suppress decisions.
@@ -56,7 +55,9 @@ The dashboard uses the same message boundary for CRUD and settings. “Why used?
 
 ## Scope and precedence
 
-For one dimension, the highest-authority candidate at the most specific matching scope wins:
+V1 stores and retrieves global scope only. Setup choices begin at 50% evidence confidence; explicit statements activate immediately; repeated direct corrections cross the activation threshold; one direct correction replaces an onboarding value. Current-request overrides and locked records retain highest authority.
+
+The retained v2 research precedence is:
 
 ```text
 current request

@@ -1,0 +1,26 @@
+{
+  "chatgpt": {
+    "composers": [
+      "#prompt-textarea",
+      "textarea[data-testid=\"prompt-textarea\"]",
+      "div.ProseMirror[contenteditable=\"true\"]"
+    ],
+    "submit": [
+      "button[data-testid=\"send-button\"]",
+      "button[aria-label=\"Send prompt\"]",
+      "button[aria-label=\"Send message\"]"
+    ]
+  },
+  "claude": {
+    "composers": [
+      "div[contenteditable=\"true\"].ProseMirror",
+      "[data-testid=\"chat-input\"] [contenteditable=\"true\"]",
+      "fieldset div[contenteditable=\"true\"]"
+    ],
+    "submit": [
+      "button[aria-label=\"Send Message\"]",
+      "button[aria-label=\"Send message\"]",
+      "button[data-testid=\"send-button\"]"
+    ]
+  }
+}

@@ -56,14 +56,14 @@ describe('PreferenceExtractor trust and durability', () => {
     expect(extractor.currentTurnConstraints('For this one, explain from scratch and use a detailed answer.').get('technical_depth')).toBe('beginner');
   });
 
-  it('extracts domain-scoped examples and implementation corrections', () => {
+  it('extracts v1 corrections into global scope', () => {
     const extractor = new PreferenceExtractor();
     expect(extractor.extract({
       text: 'For finance, use more real-world examples.',
       context: { domain: 'finance', task: 'explanation', confidence: 0.8 },
       origin: 'user_composer',
       isTrustedUserAction: true,
-    })[0]).toMatchObject({ dimension: 'example_preference', value: 'preferred', scope: { domain: 'finance' }, evidenceKind: 'direct_correction' });
+    })[0]).toMatchObject({ dimension: 'example_preference', value: 'preferred', scope: {}, evidenceKind: 'direct_correction' });
     expect(extractor.extract({
       text: 'Show me the implementation.', context, origin: 'user_composer', isTrustedUserAction: true,
     })[0]).toMatchObject({ dimension: 'code_preference', value: 'preferred' });

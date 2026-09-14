@@ -49,6 +49,40 @@ describe('PreferenceUpdater', () => {
     expect(result).toEqual(locked);
   });
 
+  it('lets one direct correction replace an onboarding declaration', async () => {
+    const store = new MemoryPreferenceStore();
+    const setup = preference('verbosity', 'detailed', {}, {
+      confidence: 0.5,
+      evidenceCount: 1,
+      state: 'inferred',
+      sourceType: 'onboarding_declaration',
+    });
+    await store.putPreference(setup);
+    const updated = await new PreferenceUpdater(store).apply({
+      dimension: 'verbosity', value: 'concise', scope: {}, strength: 0.92,
+      sourceType: 'implicit_feedback', origin: 'user_composer', observedAt: now,
+      signal: 'asks_for_conciseness', evidenceKind: 'direct_correction',
+    });
+    expect(updated).toMatchObject({ value: 'concise', sourceType: 'implicit_feedback', state: 'inferred' });
+    expect(updated.confidence).toBeGreaterThan(0.7);
+  });
+
+  it('activates a 50% onboarding declaration in global v1', async () => {
+    const store = new MemoryPreferenceStore();
+    const setup = preference('format_preference', 'bullets', {}, {
+      confidence: 0.5,
+      evidenceCount: 1,
+      state: 'inferred',
+      sourceType: 'onboarding_declaration',
+    });
+    await store.putPreference(setup);
+    const selected = await new PreferenceRetriever(store).retrieve(
+      { domain: 'general', task: 'general', confidence: 0.35 },
+      'global_learned',
+    );
+    expect(selected[0].preference.id).toBe(setup.id);
+  });
+
   it('does not compile one weak implicit signal', async () => {
     const store = new MemoryPreferenceStore();
     const updater = new PreferenceUpdater(store);

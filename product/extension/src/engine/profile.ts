@@ -32,19 +32,19 @@ interface CanonicalEvidence {
   observed_at: string;
   scope_at_observation: CanonicalScope;
   capture: {
-    mechanism: 'dashboard' | 'provider_composer' | 'profile_import';
+    mechanism: 'onboarding' | 'dashboard' | 'provider_composer' | 'profile_import';
     provider: null;
     trusted_user_surface: true;
   };
 }
 
-type CanonicalSource = 'dashboard_edit' | 'user_explicit' | 'user_correction' | 'user_implicit' | 'imported' | 'experiment';
+type CanonicalSource = 'onboarding_declaration' | 'dashboard_edit' | 'user_explicit' | 'user_correction' | 'user_implicit' | 'imported' | 'experiment';
 
 interface CanonicalPreference {
   preference_id: string;
   dimension: PreferenceDimension;
   value: string;
-  scope: CanonicalScope;
+  scope?: CanonicalScope;
   confidence: number;
   state: PreferenceState;
   source_type: CanonicalSource;
@@ -70,7 +70,7 @@ export interface CanonicalProfile {
   profile_id: string;
   created_at: string;
   updated_at: string;
-  generator: { name: 'Preference Intelligence Extension'; version: '0.1.0' };
+  generator: { name: 'Preference Intelligence Extension'; version: '0.2.0' };
   settings: {
     learning_enabled: boolean;
     raw_evidence_included: false;
@@ -91,6 +91,7 @@ function canonicalSource(source: PreferenceSource): CanonicalSource {
   return {
     explicit_feedback: 'user_explicit',
     implicit_feedback: 'user_implicit',
+    onboarding_declaration: 'onboarding_declaration',
     user_edit: 'dashboard_edit',
     profile_import: 'imported',
   }[source] as CanonicalSource;
@@ -132,15 +133,16 @@ function exportPreference(record: PreferenceRecord): CanonicalPreference {
       observed_at: item.observedAt,
       scope_at_observation: canonicalScope(item.scope ?? record.scope),
       capture: {
-        mechanism: item.origin === 'dashboard' ? 'dashboard' : item.origin === 'profile_import' ? 'profile_import' : 'provider_composer',
+        mechanism: item.origin === 'onboarding' ? 'onboarding' : item.origin === 'dashboard' ? 'dashboard' : item.origin === 'profile_import' ? 'profile_import' : 'provider_composer',
         provider: null,
         trusted_user_surface: true,
       },
     })),
     provenance: [{
-      actor: record.sourceType === 'user_edit' ? 'user' : record.sourceType === 'profile_import' ? 'import' : 'local_inference',
+      actor: record.sourceType === 'user_edit' || record.sourceType === 'onboarding_declaration'
+        ? 'user' : record.sourceType === 'profile_import' ? 'import' : 'local_inference',
       component: 'preference-intelligence-extension',
-      version: '0.1.0',
+      version: '0.2.0',
       recorded_at: record.updatedAt,
     }],
   };
@@ -154,7 +156,7 @@ export async function exportProfile(store: PreferenceStore): Promise<CanonicalPr
     profile_id: uuid(),
     created_at: now,
     updated_at: now,
-    generator: { name: 'Preference Intelligence Extension', version: '0.1.0' },
+    generator: { name: 'Preference Intelligence Extension', version: '0.2.0' },
     settings: {
       learning_enabled: settings.learningEnabled,
       raw_evidence_included: false,
@@ -189,13 +191,13 @@ function validatePreference(value: unknown): asserts value is CanonicalPreferenc
   if (typeof value.value !== 'string' || !isAllowedValue(value.dimension, value.value)) {
     throw new Error(`Unsupported value for ${value.dimension}.`);
   }
-  validateScope(value.scope);
+  if (value.scope !== undefined) validateScope(value.scope);
   if (typeof value.confidence !== 'number' || value.confidence < 0 || value.confidence > 1) throw new Error('Invalid confidence.');
   if (!validUuid(value.preference_id)) throw new Error('Invalid preference id.');
   if (!validDate(value.created_at) || !validDate(value.updated_at) || !validDate(value.last_observed_at)) throw new Error('Invalid preference timestamp.');
   if (value.expires_at !== undefined && value.expires_at !== null && !validDate(value.expires_at)) throw new Error('Invalid expiration timestamp.');
   if (!['inferred', 'confirmed', 'locked', 'suppressed', 'ambiguous'].includes(value.state)) throw new Error('Invalid preference state.');
-  if (!['dashboard_edit', 'user_explicit', 'user_correction', 'user_implicit', 'imported', 'experiment'].includes(value.source_type)) throw new Error('Invalid preference source.');
+  if (!['onboarding_declaration', 'dashboard_edit', 'user_explicit', 'user_correction', 'user_implicit', 'imported', 'experiment'].includes(value.source_type)) throw new Error('Invalid preference source.');
   if (!Number.isInteger(value.evidence_count) || value.evidence_count < 0) throw new Error('Invalid evidence count.');
   if (typeof value.user_locked !== 'boolean') throw new Error('Invalid lock state.');
   if (!object(value.decay) || !['none', 'exponential'].includes(value.decay.mode)) throw new Error('Invalid decay policy.');
@@ -207,9 +209,9 @@ function validatePreference(value: unknown): asserts value is CanonicalPreferenc
       || item.author !== 'user' || !['positive', 'negative'].includes(item.polarity)
       || !['explicit', 'correction', 'implicit'].includes(item.explicitness)
       || typeof item.strength !== 'number' || item.strength < 0 || item.strength > 1
-      || !['dashboard_edit', 'user_explicit', 'user_correction', 'user_implicit', 'imported', 'experiment'].includes(item.source_type)
+      || !['onboarding_declaration', 'dashboard_edit', 'user_explicit', 'user_correction', 'user_implicit', 'imported', 'experiment'].includes(item.source_type)
       || !validDate(item.observed_at) || !object(item.capture) || item.capture.trusted_user_surface !== true
-      || !['dashboard', 'provider_composer', 'profile_import', 'synthetic_experiment'].includes(item.capture.mechanism)) {
+      || !['onboarding', 'dashboard', 'provider_composer', 'profile_import', 'synthetic_experiment'].includes(item.capture.mechanism)) {
       throw new Error('Invalid evidence record.');
     }
     validateScope(item.scope_at_observation);
@@ -231,10 +233,11 @@ export function parseProfile(input: unknown): { records: PreferenceRecord[]; dis
 
   const records = input.preferences.map((raw) => {
     validatePreference(raw);
+    const canonical = raw.scope ?? { domain: null, subdomain: null, task: null };
     const scope: Scope = {
-      domain: (raw.scope.domain ?? undefined) as Domain | undefined,
-      subdomain: raw.scope.subdomain ?? undefined,
-      task: (raw.scope.task ?? undefined) as Task | undefined,
+      domain: (canonical.domain ?? undefined) as Domain | undefined,
+      subdomain: canonical.subdomain ?? undefined,
+      task: (canonical.task ?? undefined) as Task | undefined,
     };
     const signal = raw.evidence?.[0]?.signal_label ?? 'imported_profile_record';
     const applicabilityCorrections = raw.evidence

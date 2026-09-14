@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ChatGptAdapter } from '../src/providers/chatgpt';
 import { ClaudeAdapter } from '../src/providers/claude';
 import { adapterFor } from '../src/providers';
+import { PROVIDER_SELECTORS } from '../src/providers/selectors';
 
 describe('provider adapters', () => {
   it('reads, writes, and submits ChatGPT through adapter selectors', () => {
@@ -43,5 +44,11 @@ describe('provider adapters', () => {
 
   it('does not activate on an unsupported website', () => {
     expect(adapterFor({ hostname: 'example.com' } as Location)).toBeUndefined();
+  });
+
+  it('keeps selectors in reviewed provider data', () => {
+    expect(PROVIDER_SELECTORS.chatgpt.composers).toContain('#prompt-textarea');
+    expect(PROVIDER_SELECTORS.claude.submit).toContain('button[aria-label="Send Message"]');
+    expect(Object.isFrozen(PROVIDER_SELECTORS.chatgpt.composers)).toBe(true);
   });
 });

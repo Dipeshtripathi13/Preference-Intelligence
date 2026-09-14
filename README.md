@@ -4,16 +4,20 @@
 
 Public playground: **https://dipeshtripathi13.github.io/Preference-Intelligence/**
 
-Preference Intelligence is a local-first, provider-independent layer for learning *how a user wants an AI to respond in the current context*. It is deliberately not a general conversation-memory product.
+Preference Intelligence is a local-first, provider-independent layer for learning *how a user wants AI to respond*. It is deliberately not a general conversation-memory product. The launchable v1 uses global preferences; domain-conditioned scope remains a research track for v2.
 
-The repository contains both a working Chrome/Chromium extension and publication-oriented research infrastructure. The central question is whether a dynamically learned, domain-conditioned profile can improve subjective response quality across heterogeneous language models while using less context and exposing less private history than conversation retrieval.
+The repository contains a working Chrome/Chromium extension, a DOM-free engine package, a portable profile specification, and publication-oriented research infrastructure. V1 asks whether a transparent global profile can earn trust and evolve beyond onboarding choices. The research track separately studies whether domain conditioning improves subjective response quality.
+
+For a plain-language walkthrough of the browser data flow, confidence updates,
+multi-turn correction example, and the boundary between user feedback and AI
+responses, see [`HOW_IT_WORKS.md`](HOW_IT_WORKS.md).
 
 > Status: working local product plus 128 real local-model generations. The exploratory experiment found an input-compression/output-expansion trade-off; no human study has yet established improved subjective response quality.
 
 ## Why this is different
 
 - **Portable:** one versioned JSON profile is independent of ChatGPT, Claude, Gemini, or a local model.
-- **Contextual:** advanced Java preferences do not imply advanced physics or finance knowledge.
+- **Global-first:** v1 deliberately avoids silent domain-classifier errors; the schema retains optional scope for a later opt-in v2.
 - **Transparent:** every record exposes scope, confidence, evidence count, source, update time, lock state, and a “why used?” decision.
 - **User-governed:** users can add, edit, lock, disable, delete, reset, export, and import preferences. The current request always wins.
 - **Local-first:** the MVP keeps the profile in extension-owned IndexedDB and does not run a Preference Intelligence server.
@@ -24,9 +28,9 @@ The research review found that dynamic profiles, domain profiles, cross-AI memor
 
 ```text
 User prompt
-  -> domain/task classification
-  -> scoped preference selection and current-request conflict check
-  -> compact bounded instruction -> chosen AI provider
+  -> global preference selection and current-request conflict check
+  -> visible, editable bounded instruction
+  -> second user confirmation -> chosen AI provider
 
 Trusted user correction
   -> bounded evidence extraction
@@ -40,15 +44,19 @@ Assistant responses and arbitrary webpage content are untrusted and cannot direc
 ### Product
 
 - Manifest V3 extension with ChatGPT and Claude adapters
+- Six-screen, fully skippable paired-answer onboarding
+- Onboarding declarations at 50% confidence with one-correction replacement
+- Visible, editable pre-send injection with one-key removal
 - Standalone browser playground over the same preference engine and local store
-- Deterministic domain/task classifier with fixed-income/infrastructure coverage and multi-domain candidates
-- Separate, inspectable applicability gating; global/domain/subdomain/task retrieval; decay, conflicts, locks, and request overrides
+- Global-first runtime with no domain classifier in the v1 decision path
+- Separate DOM-free `@preference-intelligence/engine` package
+- Confidence gating, decay, conflicts, locks, and request overrides
 - Transparent React dashboard, compact popup, and unobtrusive in-provider applied-preference indicator
 - Canonical `0.1.0` profile import/export
 - Four extension experiment modes: none, static, global learned, domain-conditioned
-- 47 automated product tests plus passing typecheck, lint, and production build
+- 57 automated product tests plus passing typecheck, lint, and production build
 
-Gemini has a disabled adapter placeholder but is not granted site access until it receives live browser validation. Provider DOM integrations remain inherently brittle.
+Gemini has a disabled adapter placeholder but is not granted site access. New providers are out of v1 scope until a contributor supplies and validates an adapter. Provider DOM integrations remain inherently brittle.
 
 ### Research
 
@@ -85,6 +93,7 @@ The real pilot establishes execution and cost behavior, not subjective benefit. 
 │   └── tests/
 └── product/
     ├── docs/             # Architecture, data flow, threat model, ADRs
+    ├── preference-engine/# Publishable DOM-free npm package
     └── extension/        # Browser extension and tests
 ```
 

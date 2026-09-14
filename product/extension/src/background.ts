@@ -1,9 +1,11 @@
 import { PreferenceEngine } from './engine/engine';
+import { createOnboardingRecord } from './engine/onboarding';
 import { exportProfile, importProfile } from './engine/profile';
-import { IndexedDbPreferenceStore } from './engine/store';
+import { IndexedDbPreferenceStore } from './storage/indexedDbPreferenceStore';
 import {
   DIMENSIONS,
   isAllowedValue,
+  PRIMARY_USE_AREAS,
   type PreferenceRecord,
   type PreferenceSource,
   type PreferenceState,
@@ -69,6 +71,48 @@ async function savePreference(input: Extract<ExtensionRequest, { type: 'SAVE_PRE
   return record;
 }
 
+async function completeOnboarding(
+  request: Extract<ExtensionRequest, { type: 'COMPLETE_ONBOARDING' }>,
+): Promise<number> {
+  if (request.preferences.length > DIMENSIONS.length
+    || request.primaryUseAreas.some((area) => !PRIMARY_USE_AREAS.includes(area))) {
+    throw new Error('Invalid onboarding selection.');
+  }
+
+  const dimensions = new Set<string>();
+  for (const selection of request.preferences) {
+    if (dimensions.has(selection.dimension)
+      || !DIMENSIONS.includes(selection.dimension)
+      || !isAllowedValue(selection.dimension, selection.value)
+      || !['onboarding_choice', 'onboarding_import'].includes(selection.evidenceKind)
+      || !/^[a-z0-9_]{1,120}$/.test(selection.signal)) {
+      throw new Error('Invalid onboarding preference.');
+    }
+    dimensions.add(selection.dimension);
+  }
+
+  const existingRecords = await store.listPreferences();
+  let onboarded = 0;
+  for (const selection of request.preferences) {
+    // Setup must never weaken or replace an existing earned/user-owned value.
+    const existing = existingRecords.find((record) => record.dimension === selection.dimension
+      && !record.scope.domain && !record.scope.subdomain && !record.scope.task);
+    if (existing) continue;
+
+    const record = createOnboardingRecord(selection, new Date().toISOString(), identifier);
+    await store.putPreference(record);
+    onboarded += 1;
+  }
+
+  const settings = await store.getSettings();
+  await store.putSettings({
+    ...settings,
+    onboardingCompleted: true,
+    primaryUseAreas: [...new Set(request.primaryUseAreas)],
+  });
+  return onboarded;
+}
+
 async function handleMessage(request: ExtensionRequest, sender: chrome.runtime.MessageSender): Promise<ExtensionResponse> {
   switch (request.type) {
     case 'COMPILE_PROMPT': {
@@ -92,6 +136,9 @@ async function handleMessage(request: ExtensionRequest, sender: chrome.runtime.M
           usageLogs: await store.listUsageLogs(),
         },
       };
+    case 'COMPLETE_ONBOARDING':
+      assertDashboardSender(sender);
+      return { ok: true, onboarded: await completeOnboarding(request) };
     case 'SAVE_PREFERENCE':
       assertDashboardSender(sender);
       return { ok: true, preference: await savePreference(request.preference) };
@@ -161,4 +208,8 @@ chrome.runtime.onMessage.addListener((request: ExtensionRequest, sender, sendRes
     .then(sendResponse)
     .catch((error: unknown) => sendResponse({ ok: false, error: error instanceof Error ? error.message : 'Unknown error' }));
   return true;
+});
+
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+  if (reason === 'install') void chrome.runtime.openOptionsPage();
 });

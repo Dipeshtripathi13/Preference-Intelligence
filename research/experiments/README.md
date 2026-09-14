@@ -1,5 +1,10 @@
 # Running the experiments
 
+The proposed four-week test of whether learned preferences add value beyond
+paired-answer setup is specified in
+[`onboarding_divergence_study.md`](onboarding_divergence_study.md). It is a study
+plan only; no participant results are claimed.
+
 The core runner uses only the Python standard library. Python 3.10 or newer is
 required. A dry run never calls a network or reads an API key; it writes
 deterministic mock responses that are plainly marked as non-evidence.

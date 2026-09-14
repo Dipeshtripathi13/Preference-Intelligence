@@ -3,11 +3,13 @@ import type {
   CompiledContext,
   PreferenceDimension,
   PreferenceRecord,
+  PrimaryUseArea,
   ProductSettings,
   Scope,
   UsageLog,
 } from './engine/types';
 import type { CanonicalProfile } from './engine/profile';
+import type { OnboardingPreferenceInput } from './engine/onboarding';
 
 export interface DashboardState {
   preferences: PreferenceRecord[];
@@ -18,6 +20,7 @@ export interface DashboardState {
 export type ExtensionRequest =
   | { type: 'COMPILE_PROMPT'; prompt: string; provider: string; trustedUserAction: boolean; contextHint?: ClassifiedContext }
   | { type: 'GET_DASHBOARD_STATE' }
+  | { type: 'COMPLETE_ONBOARDING'; preferences: OnboardingPreferenceInput[]; primaryUseAreas: PrimaryUseArea[] }
   | { type: 'SAVE_PREFERENCE'; preference: { id?: string; dimension: PreferenceDimension; value: string; scope: Scope; locked: boolean; enabled: boolean; notApplicableTo?: Scope[] } }
   | { type: 'MARK_NOT_APPLICABLE'; preferenceId: string; context: ClassifiedContext }
   | { type: 'DELETE_PREFERENCE'; id: string }
@@ -34,6 +37,7 @@ export type ExtensionResponse =
   | { ok: true; preference: PreferenceRecord }
   | { ok: true; profile: CanonicalProfile }
   | { ok: true; imported: number }
+  | { ok: true; onboarded: number }
   | { ok: true }
   | { ok: false; error: string };
 

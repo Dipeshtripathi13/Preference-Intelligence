@@ -32,12 +32,17 @@ export class PreferenceEngine {
   }
 
   async processPrompt(input: ProcessPromptInput): Promise<CompiledContext> {
-    let classification = this.classifier.classify(input.prompt);
-    if (classification.domain === 'general' && input.contextHint && this.extractor.currentTurnConstraints(input.prompt).size > 0) {
+    const settings = await this.store.getSettings();
+    const condition = settings.experimentalMode ? settings.experimentCondition : 'global_learned';
+    const contextualExperiment = settings.experimentalMode && condition === 'domain_conditioned';
+    let classification: ClassifiedContext = contextualExperiment
+      ? this.classifier.classify(input.prompt)
+      : { domain: 'general', task: 'general', confidence: 1, method: 'abstained' };
+    if (contextualExperiment && classification.domain === 'general' && input.contextHint
+      && this.extractor.currentTurnConstraints(input.prompt).size > 0) {
       classification = { ...input.contextHint, confidence: Math.min(input.contextHint.confidence, 0.7) };
     }
 
-    const settings = await this.store.getSettings();
     const updates: PreferenceUpdateEvent[] = [];
     if (settings.learningEnabled && input.trustedUserAction) {
       const evidence = this.extractor.extract({
@@ -49,7 +54,8 @@ export class PreferenceEngine {
       for (const item of evidence) updates.push((await this.updater.applyDetailed(item)).event);
     }
 
-    const condition = settings.experimentalMode ? settings.experimentCondition : 'domain_conditioned';
+    // The public v1 deliberately uses global preferences. Contextual retrieval
+    // remains available only as an explicit research condition for v2 work.
     const retrieval = await this.retriever.evaluate(classification, condition);
     const ranked = this.ranker.rank(retrieval.selected);
     const selectedIds = new Set(ranked.map(({ preference }) => preference.id));

@@ -1,0 +1,27 @@
+{
+  "name": "@preference-intelligence/engine",
+  "version": "0.2.0",
+  "description": "Local-first, provider-independent response preference engine",
+  "type": "module",
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "files": ["dist", "README.md"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && esbuild ../extension/src/engine/index.ts --bundle --format=esm --platform=neutral --target=es2022 --sourcemap --outfile=dist/index.js",
+    "prepack": "npm run build",
+    "pack:check": "npm pack --dry-run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "^0.25.9",
+    "typescript": "~5.8.3"
+  }
+}
