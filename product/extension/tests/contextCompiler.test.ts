@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ContextCompiler } from '../src/engine/contextCompiler';
 import { composePersonalizedPrompt } from '../src/content/promptComposer';
-import { preference } from './helpers';
+import { preference, ranked } from './helpers';
 
 const context = { domain: 'general' as const, task: 'explanation' as const, confidence: 0.5 };
 
@@ -11,7 +11,7 @@ describe('ContextCompiler', () => {
     const result = new ContextCompiler().compile(
       'Give me a comprehensive 3,000-word explanation.',
       context,
-      [{ preference: concise, score: 9, reason: 'Global fallback' }],
+      [ranked(concise, 'Global fallback')],
     );
     expect(result.instruction).toBe('');
     expect(result.decisions[0]).toMatchObject({ status: 'overridden_by_current_prompt' });
@@ -19,7 +19,7 @@ describe('ContextCompiler', () => {
 
   it('renders only fixed templates and returns why-used metadata', () => {
     const concise = preference('verbosity', 'concise');
-    const result = new ContextCompiler().compile('What is this?', context, [{ preference: concise, score: 9, reason: 'Global fallback' }]);
+    const result = new ContextCompiler().compile('What is this?', context, [ranked(concise, 'Global fallback')]);
     expect(result.instruction).toContain('Keep the response concise.');
     expect(result.decisions[0]).toMatchObject({ preferenceId: concise.id, status: 'used' });
   });

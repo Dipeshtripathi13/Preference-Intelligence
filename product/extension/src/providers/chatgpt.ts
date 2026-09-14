@@ -1,5 +1,6 @@
 import {
   closestMatches,
+  clickFirstEnabled,
   firstElement,
   readEditable,
   writeEditable,
@@ -28,9 +29,6 @@ export class ChatGptAdapter implements ProviderAdapter {
   }
 
   submit(root: ParentNode = document): boolean {
-    const button = firstElement(root, SUBMIT);
-    if (!button) return false;
-    button.click();
-    return true;
+    return clickFirstEnabled(root, SUBMIT);
   }
 }

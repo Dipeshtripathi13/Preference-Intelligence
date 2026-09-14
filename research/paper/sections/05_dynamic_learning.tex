@@ -4,14 +4,21 @@
 The proposed updater aggregates signed, timestamped evidence by dimension and
 scope. Explicit dashboard changes and direct statements have greater authority
 than repeated implicit corrections; one ambiguous event cannot create a durable
-high-confidence preference. Contradictory evidence lowers certainty or maintains
-multiple scoped hypotheses rather than silently applying last-write-wins.
+high-confidence preference. A newer direct durable statement can supersede an
+unlocked inferred value, while weaker contradictory evidence maintains an
+explicit ambiguous state and causes selection to abstain. Locked values do not
+change automatically, but the conflict remains inspectable.
 
 Recency decay is applied to inferential evidence, while user-locked preferences do
 not decay. Temporary, task-local requests affect the current generation but are
 not promoted to durable profile values without an explicit persistence cue. Drift
 is evaluated through stable change points, temporary overrides, and alternating
 task-dependent preferences.
+
+The reference interface also accepts negative applicability evidence: ``this
+preference was not relevant here'' adds a scoped exception while retaining the
+underlying preference assertion. This creates direct supervision for the second
+error type without conflating it with preference truth.
 
 \evidencegap{Learning curves, activation precision/recall, calibration, and
 adaptation-delay estimates require the frozen longitudinal experiments.}

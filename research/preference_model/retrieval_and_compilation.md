@@ -1,6 +1,6 @@
 # Preference retrieval and context compilation
 
-Status: **proposed design**.
+Status: **reference mechanism implemented; coefficients remain uncalibrated**.
 
 ## Eligibility
 
@@ -8,15 +8,39 @@ A record is eligible only when it is enabled, unexpired, not suppressed or ambig
 
 When domain-classification confidence is below the policy threshold, only transferable global style dimensions are eligible. Domain-sensitive dimensions (`technical_depth`, `explanation_level`, `math_depth`) require a confident scope match.
 
-## Ranking
+## Applicability gate
 
-For eligible record \(p\), compute a testable ranking score:
+The implementation keeps assertion support and contextual relevance separate.
+For an otherwise eligible preference \(p\) and request \(q\):
 
 \[
-S(p,q)=w_a A(p)+w_s S_c(p,q)+w_c C(p,t)+w_r R(p,q)-w_k K(p)
+A(p,q)=0.45S_c(p,q)+0.25R(p,q)+0.30C(p,t).
 \]
 
-where authority \(A\) reflects locked/confirmed/inferred state; scope match \(S_c\) rewards task, subdomain, domain, then global; \(C\) is decayed confidence; semantic relevance \(R\) is optional and can only reorder eligible symbolic records; and conflict penalty \(K\) withholds uncertain competitors. Initial weights are implementation parameters, not learned truth, and are preregistered for evaluation.
+Here \(S_c\) is 1.00 for task, 0.98 for subdomain, 0.90 for domain, 0.75 for
+global, and 0 for a mismatch; \(R\) is a deterministic dimension/task relevance
+prior; and \(C\) is effective evidence confidence. Mismatched scope is always
+ineligible. Otherwise the initial threshold is 0.72. These are inspectable
+engineering priors, not learned or validated probabilities.
+
+Applicability corrections are also scoped. Marking a concise preference wrong for
+an educational explanation withholds it in comparable contexts without deleting
+the user's global concise preference.
+
+## Ranking
+
+For eligible record \(p\), the reference product computes:
+
+\[
+S(p,q)=100L(p)+A(p)+10\,\mathrm{Applicability}(p,q),
+\]
+
+where \(L\) is the number of populated domain/subdomain/task scope levels and
+authority \(A\) is 40 for locked, 20 for confirmed, and 0 for inferred records.
+Scope specificity therefore dominates within an eligible dimension, followed by
+user authority and applicability. Ranking cannot make an inapplicable record
+eligible. Ambiguous conflicts are withheld before ranking rather than represented
+as a soft penalty.
 
 Select at most one value per dimension. A more specific matching record outranks a global record even when the global record has modestly higher confidence, unless the scoped record fails the minimum eligibility threshold.
 
@@ -38,11 +62,17 @@ Relevant response preferences for this task:
 Current instructions override these defaults. Do not weaken safety or factuality.
 ```
 
-The compiler returns the rendered text, selected IDs, all override/withhold decisions, classification, estimated tokens, and template version.
+The compiler returns the rendered text, selected records, all override/withhold
+decisions, classification, update events, and estimated tokens.
 
 ## Budgeting
 
-Primary policy begins with a 120-token personalization budget and a maximum of six dimensions. Rank first, then greedily add complete template lines; never truncate a line into a malformed instruction. Deduplicate semantically redundant lines. Experiments vary the cap and compare actual provider token counts, adherence, and latency.
+The product injects at most eight dimensions. Rank first, then add only complete
+allowlisted template lines; never truncate a line into a malformed instruction.
+Every eligible record excluded by this cap receives a `suppressed_budget` trace.
+The compiler estimates tokens for UI inspection, while experiments record actual
+provider token counts where available. The real local-model pilot shows that
+shorter input context does not necessarily reduce output tokens or latency.
 
 ## Explanation trace
 
@@ -52,7 +82,7 @@ For every used or withheld candidate, retain a local structured decision contain
 - state and effective confidence;
 - selection or override reason;
 - matched domain/task and classifier confidence;
-- template version and estimated token contribution.
+- final applicability components and estimated compiled tokens.
 
 Normal mode does not retain the raw prompt. Experimental raw-prompt logging is separately opt-in.
 

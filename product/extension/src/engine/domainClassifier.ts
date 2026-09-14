@@ -8,6 +8,7 @@ interface DomainRule {
 
 const DOMAIN_RULES: readonly DomainRule[] = [
   { domain: 'software_engineering', subdomain: 'java', terms: ['java', 'spring boot', 'jvm', 'maven', 'gradle'] },
+  { domain: 'software_engineering', subdomain: 'infrastructure', terms: ['kubernetes', 'k8s', 'statefulset', 'operator', 'containers', 'pods', 'helm'] },
   { domain: 'software_engineering', subdomain: 'python', terms: ['python', 'django', 'fastapi', 'pytest'] },
   { domain: 'software_engineering', subdomain: 'frontend', terms: ['react', 'typescript', 'css', 'frontend', 'browser extension'] },
   { domain: 'software_engineering', subdomain: 'databases', terms: ['sql', 'database', 'postgres', 'mysql', 'index query'] },
@@ -18,7 +19,8 @@ const DOMAIN_RULES: readonly DomainRule[] = [
   { domain: 'science', subdomain: 'physics', terms: ['physics', 'quantum', 'relativity', 'force', 'momentum', 'thermodynamics'] },
   { domain: 'science', subdomain: 'biology', terms: ['biology', 'cell', 'genetics', 'evolution', 'protein'] },
   { domain: 'science', subdomain: 'chemistry', terms: ['chemistry', 'molecule', 'reaction', 'periodic table'] },
-  { domain: 'finance', terms: ['finance', 'stock', 'bond', 'portfolio', 'interest rate', 'accounting'] },
+  { domain: 'finance', subdomain: 'fixed_income', terms: ['bond', 'duration', 'convexity', 'fixed income', 'yield curve', 'coupon'] },
+  { domain: 'finance', terms: ['finance', 'stock', 'portfolio', 'interest rate', 'accounting', 'mortgage', 'amortization'] },
   { domain: 'legal', terms: ['legal', 'law', 'contract', 'statute', 'litigation'] },
   { domain: 'health', terms: ['health', 'medical', 'medicine', 'symptom', 'diagnosis', 'treatment'] },
   { domain: 'education', terms: ['lesson plan', 'curriculum', 'teach', 'student', 'pedagogy'] },
@@ -43,22 +45,39 @@ function countMatches(text: string, terms: readonly string[]): number {
 export class DomainClassifier {
   classify(prompt: string): ClassifiedContext {
     const normalized = ` ${prompt.toLowerCase()} `;
-    const scored = DOMAIN_RULES.map((rule) => ({ rule, score: countMatches(normalized, rule.terms) }))
-      .filter(({ score }) => score > 0)
-      .sort((left, right) => right.score - left.score);
+    const byDomain = new Map<Domain, { rule: DomainRule; score: number }>();
+    for (const rule of DOMAIN_RULES) {
+      const score = countMatches(normalized, rule.terms);
+      const current = byDomain.get(rule.domain);
+      if (score > 0 && (!current || score > current.score)) byDomain.set(rule.domain, { rule, score });
+    }
+    const scored = [...byDomain.values()].sort((left, right) => right.score - left.score);
 
     const best = scored[0];
     const task = TASK_RULES.find((rule) => countMatches(normalized, rule.terms) > 0)?.task ?? 'general';
 
     if (!best) {
-      return { domain: 'general', task, confidence: 0.35 };
+      return {
+        domain: 'general',
+        task,
+        confidence: 0.35,
+        method: 'abstained',
+        domains: [{ domain: 'general', confidence: 0.35 }],
+      };
     }
 
+    const domains = scored.slice(0, 3).map(({ rule, score }) => ({
+      domain: rule.domain,
+      ...(rule.subdomain ? { subdomain: rule.subdomain } : {}),
+      confidence: Math.min(0.95, 0.62 + score * 0.11),
+    }));
     return {
       domain: best.rule.domain,
       subdomain: best.rule.subdomain,
       task,
       confidence: Math.min(0.95, 0.62 + best.score * 0.11),
+      method: 'deterministic_rules',
+      domains,
     };
   }
 }

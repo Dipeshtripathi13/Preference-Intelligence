@@ -9,15 +9,19 @@ This is a research prototype. The implementation demonstrates the mechanism; it 
 ## What works
 
 - Deterministic domain/subdomain and task classification
-- Global, domain, subdomain, and task-scoped preference retrieval
-- Durable explicit versus weaker implicit correction extraction, gradual confidence updates, decay, and conflict handling
+- Multi-domain candidates plus fixed-income and infrastructure classification rules
+- Global, domain, subdomain, and task-scoped retrieval through a distinct applicability evaluator
+- Inspectable scope match, semantic relevance, evidence confidence, final applicability, and suppression decisions
+- Named evidence hierarchy, gradual repeated-correction updates, decay, direct-statement precedence, and conflict abstention
 - Current-request precedence over every stored preference
 - ChatGPT and Claude adapters behind a common provider interface
 - Background-owned IndexedDB profile and bounded decision log
-- Dashboard controls to inspect, add, edit, confirm, lock, disable, delete, and reset preferences
+- Dashboard controls to inspect, add, edit, confirm, lock, disable, delete, reset, and review applied/rejected traces
+- Small in-provider “Using N preferences” indicator with context-specific “wasn't relevant here” feedback
 - Per-domain disable controls and global learning/personalization switches
 - “Why used?” decisions with scope, confidence, source, and selection reason
 - Canonical `0.1.0` JSON profile import/export compatible with [`research/specification/preference-profile.schema.json`](../research/specification/preference-profile.schema.json)
+- Portable temporary expirations and scoped negative applicability evidence
 - Internal conditions for no personalization, static profile, global learned profile, and domain-conditioned profile
 - Opt-in raw-prompt experiment logging; off by default
 
@@ -54,6 +58,11 @@ Every prompt necessarily remains visible to the provider the user chose. Raw pro
 
 See [architecture](docs/architecture.md), [data flow](docs/data_flow.md), and [security/privacy](docs/security_privacy.md) for boundaries and limitations.
 
+The historical audit and resulting change report are in
+[`CURRENT_PRODUCT_AUDIT.md`](docs/CURRENT_PRODUCT_AUDIT.md) and
+[`PRODUCT_REVIEW_AND_CHANGES.md`](docs/PRODUCT_REVIEW_AND_CHANGES.md). Live
+provider validation follows [`EXTENSION_MANUAL_TEST.md`](docs/EXTENSION_MANUAL_TEST.md).
+
 ## Directory map
 
 ```text
@@ -74,6 +83,8 @@ product/
 
 - Provider integration is selector-based and requires periodic compatibility checks.
 - The rules-based classifier and extractor are deliberately conservative and English-only.
+- Multi-domain alternatives are visible, but the MVP selects one primary domain for preference application.
+- Evidence and applicability scores are engineering priors, not calibrated probabilities.
 - A browser extension cannot defend its local database from a fully compromised browser profile or device.
 - Profile merge protects same-ID locked records; semantic duplicate reconciliation remains future work.
 - The extension cannot alter provider-side retention, model behavior, or safety policy.

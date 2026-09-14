@@ -36,6 +36,15 @@ export class ContextCompiler {
           confidence: preference.confidence,
           status: 'overridden_by_current_prompt',
           reason: `The current request explicitly asks for ${turnValue}.`,
+          scopeMatch: candidate.scopeMatch,
+          semanticRelevance: candidate.semanticRelevance,
+          evidenceConfidence: candidate.evidenceConfidence,
+          applicability: candidate.applicability,
+          evidenceCount: preference.evidenceCount,
+          lastObservedAt: preference.lastObservedAt,
+          sourceType: preference.sourceType,
+          state: preference.state,
+          lifetime: preference.locked || preference.state === 'locked' ? 'locked' : preference.lifetime ?? 'durable',
         });
         continue;
       }
@@ -49,11 +58,20 @@ export class ContextCompiler {
         confidence: preference.confidence,
         status: 'used',
         reason: candidate.reason,
+        scopeMatch: candidate.scopeMatch,
+        semanticRelevance: candidate.semanticRelevance,
+        evidenceConfidence: candidate.evidenceConfidence,
+        applicability: candidate.applicability,
+        evidenceCount: preference.evidenceCount,
+        lastObservedAt: preference.lastObservedAt,
+        sourceType: preference.sourceType,
+        state: preference.state,
+        lifetime: preference.locked || preference.state === 'locked' ? 'locked' : preference.lifetime ?? 'durable',
       });
     }
 
     if (selected.length === 0) {
-      return { instruction: '', selected, decisions, classification, estimatedTokens: 0 };
+      return { instruction: '', selected, decisions, classification, estimatedTokens: 0, updates: [] };
     }
 
     const lines = selected.map(({ preference }) => `- ${INSTRUCTION_TEMPLATES[preference.dimension][preference.value]}`);
@@ -71,6 +89,7 @@ export class ContextCompiler {
       decisions,
       classification,
       estimatedTokens: Math.ceil(instruction.length / 4),
+      updates: [],
     };
   }
 }

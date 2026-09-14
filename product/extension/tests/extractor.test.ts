@@ -11,6 +11,15 @@ describe('PreferenceExtractor trust and durability', () => {
     }
   });
 
+  it('does not model sensitive demographic claims as response preferences', () => {
+    expect(new PreferenceExtractor().extract({
+      text: 'I am a child and my religion and political identity should be remembered.',
+      context,
+      origin: 'user_composer',
+      isTrustedUserAction: true,
+    })).toEqual([]);
+  });
+
   it('rejects a synthetic composer action', () => {
     expect(new PreferenceExtractor().extract({
       text: 'Always keep answers concise.', context, origin: 'user_composer', isTrustedUserAction: false,
@@ -45,5 +54,18 @@ describe('PreferenceExtractor trust and durability', () => {
       text: 'For this one, explain from scratch and use a detailed answer.', context, origin: 'user_composer', isTrustedUserAction: true,
     })).toEqual([]);
     expect(extractor.currentTurnConstraints('For this one, explain from scratch and use a detailed answer.').get('technical_depth')).toBe('beginner');
+  });
+
+  it('extracts domain-scoped examples and implementation corrections', () => {
+    const extractor = new PreferenceExtractor();
+    expect(extractor.extract({
+      text: 'For finance, use more real-world examples.',
+      context: { domain: 'finance', task: 'explanation', confidence: 0.8 },
+      origin: 'user_composer',
+      isTrustedUserAction: true,
+    })[0]).toMatchObject({ dimension: 'example_preference', value: 'preferred', scope: { domain: 'finance' }, evidenceKind: 'direct_correction' });
+    expect(extractor.extract({
+      text: 'Show me the implementation.', context, origin: 'user_composer', isTrustedUserAction: true,
+    })[0]).toMatchObject({ dimension: 'code_preference', value: 'preferred' });
   });
 });

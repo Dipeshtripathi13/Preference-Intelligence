@@ -80,7 +80,20 @@ export interface ClassifiedContext {
   subdomain?: string;
   task: Task;
   confidence: number;
+  method?: 'deterministic_rules' | 'abstained';
+  /** Ranked domain candidates for multi-domain inspection; the first is primary. */
+  domains?: Array<{ domain: Domain; subdomain?: string; confidence: number }>;
 }
+
+export type EvidenceKind =
+  | 'direct_statement'
+  | 'direct_correction'
+  | 'repeated_correction'
+  | 'interaction_pattern'
+  | 'dashboard_edit'
+  | 'imported';
+
+export type PreferenceLifetime = 'current_request' | 'session' | 'temporary' | 'durable' | 'locked';
 
 export interface PreferenceProvenance {
   id: string;
@@ -89,6 +102,18 @@ export interface PreferenceProvenance {
   observedAt: string;
   /** A bounded signal label, never raw chat or webpage text. */
   signal: string;
+  evidenceKind?: EvidenceKind;
+  strength?: number;
+  polarity?: 'positive' | 'negative';
+  scope?: Scope;
+}
+
+export interface PreferenceConflict {
+  competingValue: string;
+  observedAt: string;
+  evidenceKind: EvidenceKind;
+  evidenceCount: number;
+  resolution: string;
 }
 
 export interface PreferenceRecord {
@@ -106,6 +131,12 @@ export interface PreferenceRecord {
   locked: boolean;
   enabled: boolean;
   decayRate: number;
+  /** Missing on pre-0.2 local records and interpreted as durable. */
+  lifetime?: Exclude<PreferenceLifetime, 'current_request'>;
+  expiresAt?: string;
+  conflict?: PreferenceConflict;
+  /** User-authored applicability corrections; the preference itself remains intact. */
+  notApplicableTo?: Scope[];
   provenance: PreferenceProvenance[];
 }
 
@@ -118,6 +149,8 @@ export interface PreferenceEvidence {
   origin: TrustedOrigin;
   observedAt: string;
   signal: string;
+  evidenceKind?: Exclude<EvidenceKind, 'dashboard_edit' | 'imported'>;
+  lifetime?: 'durable' | 'session' | 'temporary';
 }
 
 export interface ExtractionInput {
@@ -131,7 +164,24 @@ export interface RankedPreference {
   preference: PreferenceRecord;
   score: number;
   reason: string;
+  scopeMatch: number;
+  semanticRelevance: number;
+  evidenceConfidence: number;
+  applicability: number;
 }
+
+export type UsageDecisionStatus =
+  | 'used'
+  | 'overridden_by_current_prompt'
+  | 'suppressed_scope'
+  | 'suppressed_applicability'
+  | 'suppressed_conflict'
+  | 'suppressed_confidence'
+  | 'suppressed_disabled'
+  | 'suppressed_condition'
+  | 'suppressed_expired'
+  | 'suppressed_by_more_specific'
+  | 'suppressed_budget';
 
 export interface UsageDecision {
   preferenceId: string;
@@ -139,8 +189,31 @@ export interface UsageDecision {
   value: string;
   scope: Scope;
   confidence: number;
-  status: 'used' | 'overridden_by_current_prompt' | 'disabled';
+  status: UsageDecisionStatus;
   reason: string;
+  scopeMatch: number;
+  semanticRelevance: number;
+  evidenceConfidence: number;
+  applicability: number;
+  evidenceCount: number;
+  lastObservedAt: string;
+  sourceType: PreferenceSource;
+  state: PreferenceState;
+  lifetime: PreferenceLifetime;
+}
+
+export interface PreferenceUpdateEvent {
+  preferenceId: string;
+  dimension: PreferenceDimension;
+  scope: Scope;
+  previousValue?: string;
+  value: string;
+  previousConfidence?: number;
+  confidence: number;
+  evidenceKind: EvidenceKind;
+  signal: string;
+  status: 'created' | 'reinforced' | 'changed' | 'conflict' | 'locked_conflict';
+  rationale: string;
 }
 
 export interface CompiledContext {
@@ -149,6 +222,7 @@ export interface CompiledContext {
   decisions: UsageDecision[];
   classification: ClassifiedContext;
   estimatedTokens: number;
+  updates: PreferenceUpdateEvent[];
 }
 
 export type ExperimentCondition =
@@ -172,6 +246,7 @@ export interface UsageLog {
   provider: string;
   classification: ClassifiedContext;
   decisions: UsageDecision[];
+  updates: PreferenceUpdateEvent[];
   experimentCondition: ExperimentCondition;
   estimatedTokens: number;
   rawPrompt?: string;

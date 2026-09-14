@@ -14,6 +14,13 @@ stored default, $x$ wins. Selection is therefore not merely nearest-neighbor
 retrieval; it combines scope compatibility, evidence authority, confidence,
 recency, locks, and conflict resolution.
 
+The selector distinguishes two latent decisions. Evidence confidence estimates
+support that a stored assertion reflects the user's preference; contextual
+applicability estimates whether that assertion should influence this request. A
+failure of the first is a \emph{preference-inference error}; a failure of the
+second is a \emph{preference-applicability error}. A user correction to the latter
+should not necessarily delete or globally weaken a correct preference.
+
 For subjective utility $Q(u,x,y)$, the primary estimand is the average
 within-user contrast between domain-dynamic personalization and no
 personalization over a prespecified population of users, tasks, and model

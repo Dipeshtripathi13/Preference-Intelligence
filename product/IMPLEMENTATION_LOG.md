@@ -42,3 +42,54 @@
 - Distinguish durable explicit wording from weaker correction evidence; one implicit correction remains below the retrieval threshold and repeated evidence accumulates.
 - Filter inferred records using decayed effective confidence rather than stale stored confidence.
 - Added regression coverage for explicit/implicit source authority, repeated correction activation, and stale-preference withholding.
+
+## 2026-09-13 — Preference Intelligence product proof
+
+### Completed
+
+- Audited the working repository before refactoring and preserved the canonical
+  profile → provider-neutral compiler → thin-adapter architecture.
+- Added a distinct applicability gate with inspectable scope, semantic relevance,
+  evidence-confidence, and final-applicability components.
+- Made disabled, condition-ineligible, expired, ambiguous, low-confidence,
+  irrelevant, less-specific, budget-excluded, and current-overridden preferences
+  visible as bounded local decisions.
+- Closed the ambiguous-preference leakage bug: unresolved conflict now always
+  abstains.
+- Added named evidence tiers, update events, direct-statement precedence, repeated
+  correction reinforcement, conflict rationale, lock-conflict visibility, and
+  temporary expiration round-trip.
+- Implemented a context-specific “wasn't relevant here” correction that preserves
+  the underlying preference and exports/imports as scoped negative evidence.
+- Expanded deterministic classification for fixed income and Kubernetes
+  infrastructure and exposed multi-domain candidates.
+- Rebuilt the public product around guided Java/finance switching, visible
+  abstention, a three-step learning loop, four-provider comparison, pre-generated
+  response disclosure, privacy, status, UPP import/export, and expandable profile
+  inspection.
+- Added a compact shadow-DOM indicator to ChatGPT/Claude pages and a richer
+  dashboard trace for applied and rejected candidates.
+- Hardened adapter failure handling for missing/disabled send controls and added a
+  repeatable manual live-DOM test plan.
+
+### Decisions
+
+- “Evidence confidence” and “contextual applicability” remain separate. Neither
+  is presented as a calibrated probability of response benefit.
+- Locked values receive authority but never bypass scope or applicability.
+- Negative applicability feedback is scoped and reversible; it does not globally
+  punish a correct preference.
+- Public provider outputs remain static, representative artifacts with permanent
+  disclosure. The GitHub Pages site contains no provider credentials or live API.
+- Multi-domain alternatives are exposed now, while single-primary selection is
+  retained as an explicit MVP limitation.
+
+### Verification
+
+- `npm run typecheck`: passed.
+- `npm run lint`: passed with zero warnings.
+- `npm test -- --run`: 47 tests passed across 11 files.
+- `npm run build`: passed; relative production assets emitted.
+- Built demo rendered in headless Chrome at desktop viewport.
+- Live ChatGPT/Claude DOM validation remains a documented manual task and is not
+  represented as completed.

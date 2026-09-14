@@ -15,7 +15,7 @@ Provider page
             └─ extension service worker
                  ├─ DomainClassifier
                  ├─ PreferenceExtractor → PreferenceUpdater
-                 ├─ PreferenceRetriever → PreferenceRanker
+                 ├─ PreferenceRetriever → ApplicabilityEvaluator → PreferenceRanker
                  ├─ ContextCompiler
                  └─ IndexedDbPreferenceStore
                       ├─ preferences
@@ -27,7 +27,7 @@ Dashboard / popup ── typed runtime messages ──┘
 
 ### Provider adapters
 
-`ProviderAdapter` contains only origin matching, composer discovery/read/write, submit-element recognition, and submission. ChatGPT and Claude implement it. Gemini is compiled as a placeholder but is not granted site access. No adapter reads assistant messages or conversation history.
+`ProviderAdapter` contains only origin matching, composer discovery/read/write, submit-element recognition, and submission. ChatGPT and Claude implement it. Gemini is compiled as a placeholder but is not granted site access. No adapter reads assistant messages or conversation history. A small shadow-DOM indicator renders bounded compile decisions without receiving the complete profile.
 
 ### Content boundary
 
@@ -37,8 +37,9 @@ The content script observes trusted input events inside the active composer. At 
 
 - `DomainClassifier`: conservative keyword taxonomy, independently replaceable.
 - `PreferenceExtractor`: bounded signals from trusted user-composer actions only.
-- `PreferenceUpdater`: confidence/evidence accumulation, contradiction state, lock enforcement.
-- `PreferenceRetriever`: exact hierarchy matching, decay, experiment filtering, per-dimension precedence.
+- `PreferenceUpdater`: evidence-confidence accumulation, explicit replacement, contradiction state, update events, and lock enforcement.
+- `PreferenceRetriever`: hierarchy matching, decay, experiment filtering, and complete bounded apply/suppress decisions.
+- `ApplicabilityEvaluator`: hard scope compatibility plus dimension/task relevance and evidence-confidence components.
 - `PreferenceRanker`: deterministic prompt-budget ordering.
 - `ContextCompiler`: safe templates, current-turn conflict suppression, selected-record explanations.
 - `PreferenceStore`: interface with IndexedDB and in-memory implementations.
@@ -47,7 +48,7 @@ The compiler never interpolates an arbitrary imported value. A dimension/value p
 
 ### Storage
 
-IndexedDB is opened in the extension service worker. Site content scripts do not have profile-store access. Preferences contain confidence, lifecycle state, scope, timestamps, lock/enable controls, bounded provenance labels, and no raw excerpt. Usage logs retain at most 100 entries. They are metadata-only unless raw logging is explicitly enabled in experimental mode.
+IndexedDB is opened in the extension service worker. Site content scripts do not have profile-store access. Preferences contain evidence confidence, lifecycle state, scope, timestamps, lock/enable controls, bounded provenance labels, optional expiration and scoped negative-applicability evidence, and no raw excerpt. Usage logs retain at most 100 entries. They are metadata-only unless raw logging is explicitly enabled in experimental mode.
 
 ### UI
 
@@ -65,7 +66,7 @@ current request
   > global fallback
 ```
 
-Specific scopes do not match sibling or unrelated top-level domains. Thus Java technical depth cannot enter a physics prompt. A domain `education` verbosity record outranks a global verbosity record for education prompts.
+Specific scopes do not match sibling or unrelated top-level domains. Thus Java technical depth cannot enter a physics prompt. A domain `education` verbosity record outranks a global verbosity record for education prompts. Locked state increases authority but never bypasses scope, contextual applicability, expiration, or an explicit current-request override.
 
 ## Extension build
 

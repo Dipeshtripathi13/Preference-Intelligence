@@ -1,4 +1,4 @@
-import { firstElement, readEditable, writeEditable, type ProviderAdapter } from './base';
+import { clickFirstEnabled, firstElement, readEditable, writeEditable, type ProviderAdapter } from './base';
 
 /** Adapter placeholder. It is intentionally not enabled in the manifest until its selectors are validated. */
 export class GeminiAdapter implements ProviderAdapter {
@@ -20,9 +20,6 @@ export class GeminiAdapter implements ProviderAdapter {
   }
 
   submit(root: ParentNode = document): boolean {
-    const button = firstElement(root, ['button[aria-label*="Send"]']);
-    if (!button) return false;
-    button.click();
-    return true;
+    return clickFirstEnabled(root, ['button[aria-label*="Send"]']);
   }
 }

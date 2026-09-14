@@ -17,13 +17,13 @@ interface SignalRule {
 const SIGNAL_RULES: readonly SignalRule[] = [
   { dimension: 'verbosity', value: 'concise', signal: 'asks_for_conciseness', strength: 0.92, learnAsCorrection: true, patterns: [/\b(make|keep) (it |this |(?:the )?answers? )?(shorter|concise|brief)\b/i, /\bno (long|lengthy) (answers?|explanations?)\b/i] },
   { dimension: 'verbosity', value: 'detailed', signal: 'asks_for_detail', strength: 0.88, learnAsCorrection: true, patterns: [/\b(more detail|be more detailed|thorough explanation)\b/i] },
-  { dimension: 'technical_depth', value: 'advanced', signal: 'rejects_basic_explanation', strength: 0.94, learnAsCorrection: true, patterns: [/\b(don't|do not|skip) explain (the )?(basics?|basic\s+\w+\s+syntax)\b/i, /\bassume (I am|I'm) (an )?(advanced|expert)\b/i] },
+  { dimension: 'technical_depth', value: 'advanced', signal: 'rejects_basic_explanation', strength: 0.94, learnAsCorrection: true, patterns: [/\b(don't|do not|skip)( explain)? (the )?basics?\b/i, /\bassume (I am|I'm) (an )?(advanced|expert)\b/i, /\bmake this more technical\b/i, /\bI already (know|understand) (the )?basics?\b/i] },
   { dimension: 'technical_depth', value: 'beginner', signal: 'asks_for_beginner_level', strength: 0.92, patterns: [/\b(explain|teach).*(beginner|new to|from scratch)\b/i, /\bassume (I know nothing|no prior knowledge)\b/i] },
   { dimension: 'explanation_level', value: 'foundational', signal: 'asks_for_foundations', strength: 0.85, patterns: [/\b(explain the fundamentals|start with the basics|from first principles)\b/i] },
   { dimension: 'explanation_level', value: 'minimal', signal: 'rejects_explanation', strength: 0.9, learnAsCorrection: true, patterns: [/\b(no explanation|just (give|show) me the answer)\b/i] },
-  { dimension: 'code_preference', value: 'preferred', signal: 'asks_for_code', strength: 0.9, learnAsCorrection: true, patterns: [/\b(give|show) me code first\b/i, /\bprefer (the )?code (over|to) prose\b/i] },
+  { dimension: 'code_preference', value: 'preferred', signal: 'asks_for_code', strength: 0.9, learnAsCorrection: true, patterns: [/\b(give|show) me code first\b/i, /\bprefer (the )?code (over|to) prose\b/i, /\b(show|give) me (the )?implementation\b/i] },
   { dimension: 'code_preference', value: 'avoid', signal: 'rejects_code', strength: 0.9, learnAsCorrection: true, patterns: [/\b(no code|avoid code|prose only)\b/i] },
-  { dimension: 'example_preference', value: 'preferred', signal: 'asks_for_examples', strength: 0.82, learnAsCorrection: true, patterns: [/\b(include|use|give) (more |concrete )?examples?\b/i] },
+  { dimension: 'example_preference', value: 'preferred', signal: 'asks_for_examples', strength: 0.82, learnAsCorrection: true, patterns: [/\b(include|use|give) (?:more |concrete |real-world ){0,2}examples?\b/i] },
   { dimension: 'example_preference', value: 'avoid', signal: 'rejects_examples', strength: 0.9, learnAsCorrection: true, patterns: [/\b(no examples|skip the examples)\b/i] },
   { dimension: 'analogy_preference', value: 'preferred', signal: 'asks_for_analogies', strength: 0.84, patterns: [/\b(use (an )?analog(y|ies)|explain by analogy)\b/i] },
   { dimension: 'analogy_preference', value: 'avoid', signal: 'rejects_analogies', strength: 0.9, patterns: [/\b(no analog(y|ies)|avoid analog(y|ies))\b/i] },
@@ -73,6 +73,8 @@ export class PreferenceExtractor {
         origin: 'user_composer',
         observedAt: new Date().toISOString(),
         signal: rule.signal,
+        evidenceKind: hasDurableLanguage ? 'direct_statement' : 'direct_correction',
+        lifetime: 'durable',
       }),
     );
   }

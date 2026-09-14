@@ -38,3 +38,12 @@ export function firstElement(root: ParentNode, selectors: readonly string[]): HT
   }
   return null;
 }
+
+/** Returns false rather than pretending a disabled or missing provider control was clicked. */
+export function clickFirstEnabled(root: ParentNode, selectors: readonly string[]): boolean {
+  const element = firstElement(root, selectors);
+  if (!element || element.getAttribute('aria-disabled') === 'true'
+    || (element instanceof HTMLButtonElement && element.disabled)) return false;
+  element.click();
+  return true;
+}

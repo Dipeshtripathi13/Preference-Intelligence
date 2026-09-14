@@ -3,6 +3,7 @@ import type { ExtensionResponse } from '../messaging';
 import { sendExtensionMessage } from '../messaging';
 import { adapterFor } from '../providers';
 import { composePersonalizedPrompt } from './promptComposer';
+import { showPreferenceIndicator } from './indicator';
 
 const adapter = adapterFor(window.location);
 let processing = false;
@@ -41,6 +42,14 @@ async function personalizeAndSubmit(event: Event): Promise<void> {
     if (!response.ok) throw new Error(response.error);
     if (!('compiled' in response)) throw new Error('Invalid compile response.');
     contextHint = response.compiled.classification;
+    showPreferenceIndicator(response.compiled, document, async (preferenceId) => {
+      const update = await sendExtensionMessage<ExtensionResponse>({
+        type: 'MARK_NOT_APPLICABLE',
+        preferenceId,
+        context: response.compiled.classification,
+      });
+      if (!update.ok) throw new Error(update.error);
+    });
     if (response.compiled.instruction) {
       adapter.writePrompt(composer, composePersonalizedPrompt(prompt, response.compiled.instruction));
     }

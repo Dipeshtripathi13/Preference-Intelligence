@@ -33,7 +33,7 @@ function PreferenceCard({ preference, latestDecision, onChanged }: PreferenceCar
   const [whyOpen, setWhyOpen] = useState(false);
   const [value, setValue] = useState(preference.value);
 
-  async function save(patch: Partial<Pick<PreferenceRecord, 'value' | 'locked' | 'enabled'>> = {}) {
+  async function save(patch: Partial<Pick<PreferenceRecord, 'value' | 'locked' | 'enabled' | 'notApplicableTo'>> = {}) {
     await requireOk({
       type: 'SAVE_PREFERENCE',
       preference: {
@@ -43,6 +43,7 @@ function PreferenceCard({ preference, latestDecision, onChanged }: PreferenceCar
         scope: preference.scope,
         locked: patch.locked ?? preference.locked,
         enabled: patch.enabled ?? preference.enabled,
+        notApplicableTo: patch.notApplicableTo ?? preference.notApplicableTo,
       },
     });
     setEditing(false);
@@ -66,28 +67,30 @@ function PreferenceCard({ preference, latestDecision, onChanged }: PreferenceCar
             </select>
           ) : <p className="value">{label(preference.value)}</p>}
         </div>
-        <span className={`state state--${preference.state}`}>{label(preference.state)}</span>
+        <span className={`state state--${preference.state}`}>{preference.enabled ? label(preference.state) : 'Disabled'}</span>
       </div>
-      <div className="meter" title={`${Math.round(preference.confidence * 100)}% confidence`}>
+      <div className="meter" title={`${Math.round(preference.confidence * 100)}% evidence confidence`}>
         <span style={{ width: `${preference.confidence * 100}%` }} />
       </div>
-      <p className="meta">{Math.round(preference.confidence * 100)}% confidence · {preference.evidenceCount} evidence event{preference.evidenceCount === 1 ? '' : 's'}</p>
+      <p className="meta">{Math.round(preference.confidence * 100)}% evidence confidence · {preference.evidenceCount} observation{preference.evidenceCount === 1 ? '' : 's'} · {label(preference.lifetime ?? 'durable')}</p>
       <div className="card-actions">
         {editing ? <button className="primary small" onClick={() => void save()}>Save</button> : <button className="small" onClick={() => setEditing(true)}>Edit</button>}
         <button className="small" onClick={() => void save({ locked: !preference.locked })}>{preference.locked ? 'Unlock' : 'Lock'}</button>
         <button className="small" onClick={() => void save({ enabled: !preference.enabled })}>{preference.enabled ? 'Disable' : 'Enable'}</button>
         <button className="small danger" onClick={() => void remove()}>Delete</button>
-        <button className="small link-button" onClick={() => setWhyOpen(!whyOpen)}>Why used?</button>
+        <button className="small link-button" onClick={() => setWhyOpen(!whyOpen)}>Why?</button>
       </div>
       {whyOpen && (
         <div className="why-box">
-          <strong>{latestDecision ? label(latestDecision.status) : 'Not used recently'}</strong>
-          <p>{latestDecision?.reason ?? 'No recent prompt selected this preference.'}</p>
+          <strong>{latestDecision ? label(latestDecision.status) : 'No recent decision'}</strong>
+          <p>{latestDecision?.reason ?? 'No recent prompt evaluated this preference.'}</p>
           <dl>
             <div><dt>Scope</dt><dd>{[preference.scope.domain, preference.scope.subdomain, preference.scope.task].filter((item): item is string => Boolean(item)).map(label).join(' / ') || 'Global'}</dd></div>
-            <div><dt>Last updated</dt><dd>{new Date(preference.updatedAt).toLocaleString()}</dd></div>
+            <div><dt>Last observed</dt><dd>{new Date(preference.lastObservedAt).toLocaleString()}</dd></div>
             <div><dt>Source</dt><dd>{label(preference.sourceType)}</dd></div>
+            {latestDecision && <><div><dt>Scope match</dt><dd>{Math.round((latestDecision.scopeMatch ?? 0) * 100)}%</dd></div><div><dt>Semantic relevance</dt><dd>{Math.round((latestDecision.semanticRelevance ?? 0) * 100)}%</dd></div><div><dt>Final applicability</dt><dd>{Math.round((latestDecision.applicability ?? 0) * 100)}%</dd></div></>}
           </dl>
+          {Boolean(preference.notApplicableTo?.length) && <button className="small" onClick={() => void save({ notApplicableTo: [] })}>Clear {preference.notApplicableTo!.length} applicability correction{preference.notApplicableTo!.length === 1 ? '' : 's'}</button>}
         </div>
       )}
     </article>
@@ -212,6 +215,11 @@ export default function App() {
         <div className="profile-actions"><button onClick={() => void exportData()}>Export JSON</button><label className="button-like">Import JSON<input type="file" accept="application/json" onChange={(event) => void importData(event)} /></label><button className="danger" onClick={() => void reset()}>Reset profile</button></div>
       </section>
 
+      <section className="panel privacy-dashboard">
+        <div className="section-title"><div><p className="eyebrow">Privacy boundary</p><h2>What this extension keeps</h2></div><span>No Preference Intelligence server</span></div>
+        <div className="privacy-dashboard__grid"><div><h3>Stored locally</h3><p>✓ Preferences and scopes</p><p>✓ Evidence confidence and bounded signal labels</p><p>✓ Applied and suppressed decision metadata</p></div><div><h3>Not stored by default</h3><p>× Full chat or browsing history</p><p>× Assistant-authored claims about you</p><p>× Sensitive demographic profiles</p></div></div>
+      </section>
+
       <section className="panel">
         <div className="section-title"><div><p className="eyebrow">Profile</p><h2>Response preferences</h2></div><span>{data?.preferences.length ?? 0} total</span></div>
         <NewPreference onCreated={refresh} />
@@ -240,6 +248,19 @@ export default function App() {
           <label className="toggle warning"><input type="checkbox" checked={data?.settings.recordRawPrompts ?? false} onChange={(event) => void updateSettings({ recordRawPrompts: event.target.checked })} /><span>Record raw prompts locally</span><small>Off by default. Use only with non-sensitive experiment prompts.</small></label>
           <p>{data?.usageLogs.length ?? 0} recent local decision logs. Compact logs omit prompt and response text unless raw prompt logging is explicitly enabled.</p>
           <button onClick={() => void requireOk({ type: 'CLEAR_USAGE_LOGS' }).then(refresh)}>Clear experiment logs</button>
+        </div>
+      </details>
+
+      <details className="panel experimental developer-inspector">
+        <summary><div><p className="eyebrow">Developer / researcher view</p><h2>Latest selection trace</h2></div><span>{data?.usageLogs[0] ? 'Available' : 'No trace'}</span></summary>
+        <div className="experimental-body trace-body">
+          {!data?.usageLogs[0] && <p>Submit a prompt on a supported provider to create a compact local trace.</p>}
+          {data?.usageLogs[0] && <>
+            <dl className="trace-summary"><div><dt>Provider</dt><dd>{label(data.usageLogs[0].provider)}</dd></div><div><dt>Classification</dt><dd>{label(data.usageLogs[0].classification.domain)} / {label(data.usageLogs[0].classification.task)}</dd></div><div><dt>Preference tokens</dt><dd>≈{data.usageLogs[0].estimatedTokens}</dd></div><div><dt>Condition</dt><dd>{label(data.usageLogs[0].experimentCondition)}</dd></div></dl>
+            <div className="trace-list">{data.usageLogs[0].decisions.map((decision) => <article key={`${decision.preferenceId}-${decision.status}`}><b>{label(decision.dimension)} → {label(decision.value)}</b><span>{label(decision.status)}</span><p>{decision.reason}</p><small>scope {Math.round((decision.scopeMatch ?? 0) * 100)}% · semantic {Math.round((decision.semanticRelevance ?? 0) * 100)}% · evidence {Math.round((decision.evidenceConfidence ?? decision.confidence) * 100)}% · final {Math.round((decision.applicability ?? 0) * 100)}%</small></article>)}</div>
+            {Boolean(data.usageLogs[0].updates?.length) && <div><h3>Preference updates</h3>{(data.usageLogs[0].updates ?? []).map((update) => <p key={`${update.preferenceId}-${update.signal}`}>{label(update.dimension)}: {label(update.previousValue ?? 'new')} → {label(update.value)} ({Math.round((update.previousConfidence ?? 0) * 100)}% → {Math.round(update.confidence * 100)}%) — {update.rationale}</p>)}</div>}
+            <details><summary>Provider payload / compiled context</summary><pre>{data.usageLogs[0].compiledInstruction ?? 'Not retained in normal mode. Enable experimental mode and raw-prompt logging only for non-sensitive research prompts.'}</pre></details>
+          </>}
         </div>
       </details>
     </main>

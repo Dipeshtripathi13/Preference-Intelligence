@@ -58,9 +58,11 @@ async function savePreference(input: Extract<ExtensionRequest, { type: 'SAVE_PRE
     locked: input.locked,
     enabled: input.enabled,
     decayRate: 0,
+    lifetime: input.locked ? 'locked' : 'durable',
+    notApplicableTo: input.notApplicableTo ?? existing?.notApplicableTo,
     provenance: [
       ...(existing?.provenance ?? []),
-      { id: identifier(), sourceType, origin: 'dashboard' as const, observedAt: now, signal: existing ? 'dashboard_edit' : 'dashboard_create' },
+      { id: identifier(), sourceType, origin: 'dashboard' as const, observedAt: now, signal: existing ? 'dashboard_edit' : 'dashboard_create', evidenceKind: 'dashboard_edit' as const, strength: 1 },
     ].slice(-50),
   };
   await store.putPreference(record);
@@ -97,6 +99,33 @@ async function handleMessage(request: ExtensionRequest, sender: chrome.runtime.M
       assertDashboardSender(sender);
       await store.deletePreference(request.id);
       return { ok: true };
+    case 'MARK_NOT_APPLICABLE': {
+      if (!providerSender(sender)) throw new Error('Rejected applicability correction from an untrusted sender.');
+      const record = await store.getPreference(request.preferenceId);
+      if (!record) throw new Error('Preference not found.');
+      const correction = {
+        domain: request.context.domain,
+        subdomain: request.context.subdomain,
+        task: request.context.task,
+      };
+      await store.putPreference({
+        ...record,
+        updatedAt: new Date().toISOString(),
+        notApplicableTo: [...(record.notApplicableTo ?? []), correction].slice(-25),
+        provenance: [...record.provenance, {
+          id: identifier(),
+          sourceType: 'implicit_feedback' as const,
+          origin: 'user_composer' as const,
+          observedAt: new Date().toISOString(),
+          signal: 'not_applicable_for_context',
+          evidenceKind: 'direct_correction' as const,
+          strength: 1,
+          polarity: 'negative' as const,
+          scope: correction,
+        }].slice(-50),
+      });
+      return { ok: true };
+    }
     case 'RESET_PROFILE':
       assertDashboardSender(sender);
       await store.clearPreferences();

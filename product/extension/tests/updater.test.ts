@@ -17,13 +17,28 @@ describe('PreferenceUpdater', () => {
     expect(second.evidenceCount).toBe(2);
   });
 
-  it('marks contradictory evidence ambiguous instead of silently preserving certainty', async () => {
+  it('lets a newer direct preference statement supersede an inferred value', async () => {
     const store = new MemoryPreferenceStore();
     const existing = preference('verbosity', 'concise', {}, { state: 'inferred', confidence: 0.75 });
     await store.putPreference(existing);
     const updated = await new PreferenceUpdater(store).apply({ dimension: 'verbosity', value: 'detailed', scope: {}, strength: 0.9, sourceType: 'explicit_feedback', origin: 'user_composer', observedAt: now, signal: 'asks_for_detail' });
-    expect(updated.state).toBe('ambiguous');
-    expect(updated.confidence).toBeLessThan(existing.confidence);
+    expect(updated).toMatchObject({ state: 'confirmed', value: 'detailed' });
+    expect(updated.confidence).toBeGreaterThan(existing.confidence);
+  });
+
+  it('abstains when weak interaction evidence conflicts', async () => {
+    const store = new MemoryPreferenceStore();
+    const existing = preference('verbosity', 'concise', {}, { state: 'inferred', confidence: 0.6 });
+    await store.putPreference(existing);
+    const updated = await new PreferenceUpdater(store).apply({
+      dimension: 'verbosity', value: 'detailed', scope: {}, strength: 0.5,
+      sourceType: 'implicit_feedback', origin: 'user_composer', observedAt: now,
+      signal: 'interaction_pattern', evidenceKind: 'interaction_pattern',
+    });
+    expect(updated).toMatchObject({ state: 'ambiguous', value: 'concise' });
+    const result = await new PreferenceRetriever(store).evaluate({ domain: 'general', task: 'general', confidence: 0.35 });
+    expect(result.selected).toEqual([]);
+    expect(result.decisions[0]).toMatchObject({ status: 'suppressed_conflict' });
   });
 
   it('never modifies a locked preference', async () => {

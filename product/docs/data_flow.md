@@ -7,11 +7,12 @@
 3. The adapter reads the current composer. Equality with the trusted snapshot determines learning eligibility.
 4. The service worker classifies the original prompt.
 5. If learning is enabled and the action is trusted, the extractor emits bounded user-authored evidence and the updater stores it.
-6. The retriever fetches only enabled records matching the current scope and experiment condition.
-7. The ranker selects a bounded set; the compiler suppresses dimensions explicitly overridden in the current request.
-8. A metadata decision log is stored locally for explanation.
-9. The content script writes `compiled preferences → authoritative current request` and activates the provider's submit control.
-10. The chosen provider receives the composed prompt. Preference Intelligence does not observe the response.
+6. The retriever evaluates every bounded record for enablement, condition, expiry, conflict, scope, evidence threshold, and user-authored applicability exceptions.
+7. The applicability evaluator separately scores scope match, semantic/task relevance, and effective evidence confidence. Ranking cannot rescue an inapplicable preference.
+8. The ranker selects at most eight dimensions; the compiler suppresses dimensions explicitly overridden in the current request.
+9. Applied and suppressed metadata decisions plus any update events are stored locally for explanation.
+10. The content script writes `compiled preferences → authoritative current request`, activates the provider's submit control, and shows a small applied-count indicator.
+11. The chosen provider receives the composed prompt. Preference Intelligence does not observe the response.
 
 On any internal error, the content script restores the original prompt and attempts a normal provider submission. A processing guard ignores synthetic submit clicks created by the adapter.
 
@@ -27,6 +28,14 @@ trusted composer text
 ```
 
 Assistant text, rendered page text, network responses, and DOM elements outside the composer have no extraction path. A brief correction such as “make it shorter” may use the preceding in-tab classification hint; ordinary general prompts do not inherit the hint.
+
+## Correcting applicability
+
+Choosing “Wasn't relevant here” from the in-page indicator sends the preference ID
+and current classification—not the raw prompt—to the trusted service worker. The
+worker retains the preference, adds a scoped `notApplicableTo` exception, and
+records bounded negative evidence. Export maps that correction into the existing
+canonical evidence array so it can be imported on another device.
 
 ## Dashboard operations
 
@@ -50,4 +59,7 @@ The default condition is domain-conditioned personalization. Developer mode can 
 - `global_learned`
 - `domain_conditioned`
 
-Condition, selected records, context classification, timestamp, provider, and estimated token overhead are logged locally. Prompt text and compiled context are added only when the separate raw-prompt toggle is enabled.
+Condition, applied and suppressed records, applicability components, update events,
+context classification, timestamp, provider, and estimated token overhead are
+logged locally. Prompt text and compiled context are added only when the separate
+raw-prompt toggle is enabled.

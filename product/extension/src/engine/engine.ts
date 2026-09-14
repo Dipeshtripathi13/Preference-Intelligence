@@ -4,7 +4,7 @@ import { PreferenceExtractor } from './extractor';
 import { PreferenceRanker } from './ranker';
 import { PreferenceRetriever } from './retriever';
 import type { PreferenceStore } from './store';
-import type { ClassifiedContext, CompiledContext, UsageLog } from './types';
+import type { ClassifiedContext, CompiledContext, PreferenceUpdateEvent, UsageDecision, UsageLog } from './types';
 import { PreferenceUpdater } from './updater';
 
 function identifier(): string {
@@ -38,6 +38,7 @@ export class PreferenceEngine {
     }
 
     const settings = await this.store.getSettings();
+    const updates: PreferenceUpdateEvent[] = [];
     if (settings.learningEnabled && input.trustedUserAction) {
       const evidence = this.extractor.extract({
         text: input.prompt,
@@ -45,18 +46,48 @@ export class PreferenceEngine {
         origin: 'user_composer',
         isTrustedUserAction: true,
       });
-      for (const item of evidence) await this.updater.apply(item);
+      for (const item of evidence) updates.push((await this.updater.applyDetailed(item)).event);
     }
 
     const condition = settings.experimentalMode ? settings.experimentCondition : 'domain_conditioned';
-    const retrieved = await this.retriever.retrieve(classification, condition);
-    const compiled = this.compiler.compile(input.prompt, classification, this.ranker.rank(retrieved));
+    const retrieval = await this.retriever.evaluate(classification, condition);
+    const ranked = this.ranker.rank(retrieval.selected);
+    const selectedIds = new Set(ranked.map(({ preference }) => preference.id));
+    const budgetDecisions: UsageDecision[] = retrieval.selected
+      .filter(({ preference }) => !selectedIds.has(preference.id))
+      .map((candidate) => ({
+        preferenceId: candidate.preference.id,
+        dimension: candidate.preference.dimension,
+        value: candidate.preference.value,
+        scope: candidate.preference.scope,
+        confidence: candidate.preference.confidence,
+        status: 'suppressed_budget',
+        reason: 'Excluded by the compact eight-preference prompt budget.',
+        scopeMatch: candidate.scopeMatch,
+        semanticRelevance: candidate.semanticRelevance,
+        evidenceConfidence: candidate.evidenceConfidence,
+        applicability: candidate.applicability,
+        evidenceCount: candidate.preference.evidenceCount,
+        lastObservedAt: candidate.preference.lastObservedAt,
+        sourceType: candidate.preference.sourceType,
+        state: candidate.preference.state,
+        lifetime: candidate.preference.locked || candidate.preference.state === 'locked'
+          ? 'locked'
+          : candidate.preference.lifetime ?? 'durable',
+      }));
+    const base = this.compiler.compile(input.prompt, classification, ranked);
+    const compiled: CompiledContext = {
+      ...base,
+      decisions: [...retrieval.decisions, ...budgetDecisions, ...base.decisions],
+      updates,
+    };
     const log: UsageLog = {
       id: identifier(),
       timestamp: new Date().toISOString(),
       provider: input.provider,
       classification,
       decisions: compiled.decisions,
+      updates,
       experimentCondition: condition,
       estimatedTokens: compiled.estimatedTokens,
       ...(settings.experimentalMode && settings.recordRawPrompts

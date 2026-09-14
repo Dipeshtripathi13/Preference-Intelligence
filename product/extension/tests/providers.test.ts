@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ChatGptAdapter } from '../src/providers/chatgpt';
 import { ClaudeAdapter } from '../src/providers/claude';
+import { adapterFor } from '../src/providers';
 
 describe('provider adapters', () => {
   it('reads, writes, and submits ChatGPT through adapter selectors', () => {
@@ -24,5 +25,23 @@ describe('provider adapters', () => {
     expect(adapter.matches({ hostname: 'example.com' } as Location)).toBe(false);
     expect(adapter.readPrompt(adapter.findComposer()!)).toBe('Explain this');
     expect(adapter.isSubmitElement(document.querySelector('button')!)).toBe(true);
+  });
+
+  it('recognizes clicks on children inside the provider send control', () => {
+    document.body.innerHTML = '<button aria-label="Send message"><svg><path id="icon" /></svg></button>';
+    expect(new ChatGptAdapter().isSubmitElement(document.querySelector('#icon')!)).toBe(true);
+  });
+
+  it('fails closed when a provider composer or enabled send button is unavailable', () => {
+    document.body.innerHTML = '<button data-testid="send-button" disabled>Send</button>';
+    const adapter = new ChatGptAdapter();
+    expect(adapter.findComposer()).toBeNull();
+    expect(adapter.submit()).toBe(false);
+    document.body.innerHTML = '<button aria-label="Send Message" aria-disabled="true">Send</button>';
+    expect(new ClaudeAdapter().submit()).toBe(false);
+  });
+
+  it('does not activate on an unsupported website', () => {
+    expect(adapterFor({ hostname: 'example.com' } as Location)).toBeUndefined();
   });
 });

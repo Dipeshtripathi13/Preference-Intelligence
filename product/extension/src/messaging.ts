@@ -18,7 +18,8 @@ export interface DashboardState {
 export type ExtensionRequest =
   | { type: 'COMPILE_PROMPT'; prompt: string; provider: string; trustedUserAction: boolean; contextHint?: ClassifiedContext }
   | { type: 'GET_DASHBOARD_STATE' }
-  | { type: 'SAVE_PREFERENCE'; preference: { id?: string; dimension: PreferenceDimension; value: string; scope: Scope; locked: boolean; enabled: boolean } }
+  | { type: 'SAVE_PREFERENCE'; preference: { id?: string; dimension: PreferenceDimension; value: string; scope: Scope; locked: boolean; enabled: boolean; notApplicableTo?: Scope[] } }
+  | { type: 'MARK_NOT_APPLICABLE'; preferenceId: string; context: ClassifiedContext }
   | { type: 'DELETE_PREFERENCE'; id: string }
   | { type: 'RESET_PROFILE' }
   | { type: 'UPDATE_SETTINGS'; settings: Partial<ProductSettings> }

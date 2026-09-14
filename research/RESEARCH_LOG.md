@@ -87,3 +87,35 @@
 - **Source:** `paper/main.tex`, `paper/sections/08_results.tex`, and the checked-in raw/analysis artifacts.
 - **Implication:** Present the 128-generation cost trade-off honestly; retain improved subjective quality as the primary open hypothesis for an approved preregistered study.
 - **Open question:** Whether the resulting contribution best fits an HCI governance venue or an NLP systems/evaluation venue depends on the human and correctness outcomes.
+
+## 2026-09-13 — Applicability separated from preference inference
+
+- **Question:** Can evidence that a preference is true determine whether it should
+  affect a particular response?
+- **Finding:** No. The reference implementation now exposes evidence confidence,
+  scope match, semantic/task relevance, and final applicability separately. A
+  99%-supported code preference can still be withheld from a fixed-income
+  explanation, and locked state cannot bypass relevance.
+- **Source:** `product/extension/src/engine/applicabilityEvaluator.ts`,
+  `retriever.ts`, and product applicability tests.
+- **Implication:** Evaluation needs two error labels: preference-inference error
+  and preference-applicability error. Calibration of profile truth alone is
+  insufficient; the study must measure false application, abstention coverage,
+  and harm.
+- **Open question:** Which request features and thresholds predict target-user
+  judgments of applicability across domains and model families?
+
+## 2026-09-13 — Negative applicability evidence implemented
+
+- **Question:** How should “this preference wasn't relevant here” affect a portable
+  profile?
+- **Finding:** Globally weakening or deleting the preference conflates two error
+  types. The product now keeps the assertion but stores a scoped negative event,
+  which is portable through the existing evidence structure.
+- **Source:** `product/extension/src/content/indicator.ts`, `engine/profile.ts`,
+  and `product/docs/PRODUCT_REVIEW_AND_CHANGES.md`.
+- **Implication:** Contextual negative feedback is a candidate research
+  contribution and clean supervision signal for applicability learning. Measure
+  whether this control improves recovery without creating excessive suppression.
+- **Open question:** How broadly should a negative context generalize across task,
+  subdomain, and session boundaries?

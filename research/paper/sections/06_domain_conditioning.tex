@@ -7,6 +7,13 @@ selector admits global defaults and compatible domain, subdomain, and task
 records, resolves each dimension by specificity and authority, and applies a
 confidence threshold. Missing domain knowledge remains unknown.
 
+The reference implementation operationalizes a separate applicability gate as a
+weighted combination of symbolic scope match, dimension--task relevance, and
+decayed evidence confidence. Scope mismatch is a hard rejection; locked state
+does not bypass it. The present coefficients are inspectable engineering priors,
+not fitted probabilities or experimental findings. Every application and
+rejection produces a bounded explanation trace for error analysis.
+
 The controlled benchmark deliberately pairs high familiarity in one domain with
 low familiarity in another. It also includes ambiguous domains and explicit
 current-request overrides. The central mechanism ablation removes scope while

@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { PreferenceEngine } from '../src/engine/engine';
 import { MemoryPreferenceStore } from '../src/engine/store';
+import { DIMENSIONS, VALUES_BY_DIMENSION } from '../src/engine/types';
+import { preference } from './helpers';
 
 describe('PreferenceEngine', () => {
   it('executes but does not persist a current-only preference request', async () => {
@@ -40,5 +42,19 @@ describe('PreferenceEngine', () => {
     expect(first.selected).toEqual([]);
     expect(second.selected).toHaveLength(1);
     expect(second.selected[0].preference.sourceType).toBe('implicit_feedback');
+  });
+
+  it('limits excessive eligible preferences and records budget suppression', async () => {
+    const store = new MemoryPreferenceStore();
+    for (const dimension of DIMENSIONS) {
+      await store.putPreference(preference(dimension, VALUES_BY_DIMENSION[dimension][1], {}));
+    }
+    const result = await new PreferenceEngine(store).processPrompt({
+      prompt: 'Implement a Java function and explain the calculation.',
+      provider: 'chatgpt',
+      trustedUserAction: false,
+    });
+    expect(result.selected).toHaveLength(8);
+    expect(result.decisions.filter(({ status }) => status === 'suppressed_budget').length).toBeGreaterThan(0);
   });
 });

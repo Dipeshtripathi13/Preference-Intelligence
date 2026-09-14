@@ -1,4 +1,4 @@
-import type { PreferenceRecord, Scope } from '../src/engine/types';
+import type { PreferenceRecord, RankedPreference, Scope } from '../src/engine/types';
 
 let sequence = 0;
 
@@ -27,5 +27,17 @@ export function preference(
     decayRate: 0.002,
     provenance: [{ id: `evidence-${sequence}`, sourceType: 'explicit_feedback', origin: 'user_composer', observedAt: now, signal: 'test_signal' }],
     ...overrides,
+  };
+}
+
+export function ranked(record: PreferenceRecord, reason = 'Test applicability match'): RankedPreference {
+  return {
+    preference: record,
+    score: 9,
+    reason,
+    scopeMatch: record.scope.domain ? 0.9 : 0.75,
+    semanticRelevance: 0.92,
+    evidenceConfidence: record.confidence,
+    applicability: 0.84,
   };
 }

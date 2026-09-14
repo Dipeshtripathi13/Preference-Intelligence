@@ -41,12 +41,12 @@ Assistant responses and arbitrary webpage content are untrusted and cannot direc
 
 - Manifest V3 extension with ChatGPT and Claude adapters
 - Standalone browser playground over the same preference engine and local store
-- Deterministic domain/task classifier and twelve bounded preference dimensions
-- Global/domain/subdomain/task retrieval, decay, conflicts, locks, and request overrides
-- Transparent React dashboard and compact popup
+- Deterministic domain/task classifier with fixed-income/infrastructure coverage and multi-domain candidates
+- Separate, inspectable applicability gating; global/domain/subdomain/task retrieval; decay, conflicts, locks, and request overrides
+- Transparent React dashboard, compact popup, and unobtrusive in-provider applied-preference indicator
 - Canonical `0.1.0` profile import/export
 - Four extension experiment modes: none, static, global learned, domain-conditioned
-- 27 automated tests plus passing typecheck, lint, and production build
+- 47 automated product tests plus passing typecheck, lint, and production build
 
 Gemini has a disabled adapter placeholder but is not granted site access until it receives live browser validation. Provider DOM integrations remain inherently brittle.
 

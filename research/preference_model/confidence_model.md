@@ -1,57 +1,88 @@
-# Confidence model
+# Evidence-confidence model
 
-Status: **proposed, testable algorithm**. Coefficients are engineering priors and require calibration against user confirmation data.
+Status: **implemented engineering prior; not empirically calibrated**.
 
-## Evidence weight
+The product deliberately calls this quantity *evidence confidence*. It estimates
+support for a bounded preference assertion. It is not the probability that the
+preference will improve a response, the probability that a classifier is correct,
+or a measure of contextual relevance.
 
-For evidence event \(e\) observed at time \(t_e\), the signed contribution at evaluation time \(t\) is:
+## Evidence hierarchy
 
-\[
-w_e(t) = p_e \cdot a_e \cdot s_e \cdot q_e \cdot r_e(t)
-\]
+The reference updater uses the following authority order:
 
-where:
+| Evidence | Product representation | Behavior |
+|---|---|---|
+| Dashboard edit or lock | `dashboard_edit` | User-authored ground truth; confidence 1.0 in the extension dashboard. |
+| Direct durable statement | `direct_statement` | Strongest learned evidence; may activate immediately and a newer statement supersedes an older inferred value. |
+| Direct correction | `direct_correction` | One new preference is retained below activation threshold; a correction to an existing value may change it because the user explicitly rejected the current behavior. |
+| Repeated consistent correction | `repeated_correction` | Confidence increases and can cross the activation threshold. |
+| Interaction pattern | `interaction_pattern` | Weakest supported tier; contradictory evidence produces ambiguity and abstention rather than a large update. |
 
-- \(p_e \in \{-1,+1\}\) is polarity;
-- \(a_e\) is source authority (`dashboard_edit=1.0`, `user_explicit=0.95`, `user_correction=0.80`, `user_implicit=0.25`, non-user source `=0`);
-- \(s_e \in [0,1]\) is extractor strength;
-- \(q_e \in [0,1]\) is evidence-quality/provenance validity;
-- \(r_e(t)\) is recency retention from the decay model.
+Assistant messages and webpage content have zero authority. They never enter the
+updater. Raw correction text is not retained; the durable record contains an
+allowlisted signal label, time, source, scope, strength, and polarity.
 
-Repeated identical events are capped per interaction and per day so UI retries or duplicated DOM events do not manufacture certainty.
+## Reference update equations
 
-## Posterior-like update
-
-Maintain positive and negative effective masses with weak prior \(\alpha_0=\beta_0=1\):
-
-\[
-\alpha=\alpha_0+\sum\max(w_e,0), \qquad
-\beta=\beta_0+\sum\max(-w_e,0)
-\]
-
-The support ratio is \(m=\alpha/(\alpha+\beta)\). Evidence sufficiency is \(n=1-\exp(-k\sum |w_e|)\), initially \(k=0.7\). Displayed confidence is:
+For extractor strength \(s\in[0,1]\), a new direct statement starts at
 
 \[
-c = 0.5 + (m-0.5)n
+c_0=\min(0.90, 0.58+0.32s).
 \]
 
-This prevents one weak implicit event from yielding high confidence. A direct user edit or lock uses state-based authority and may set an explicit confidence independent of this inference score.
+A first direct correction starts cautiously at
+\(\min(0.34,0.10+0.25s)\); a general interaction pattern starts at
+\(\min(0.28,0.08+0.20s)\). Thus one implicit observation cannot pass the
+product's 0.35 evidence gate.
 
-## Consistency and contradiction
+Consistent evidence updates confidence as
 
-Candidate values for a dimension compete within the same scope. Selection uses effective support, not confidence alone. If the two leading values differ by less than `conflict_margin` (initially 0.15 effective support), neither is automatically compiled. Negative evidence is attached to the rejected value when it clearly contradicts it; otherwise it is recorded as support for the new value.
+\[
+c'=\min\left(0.99,c+(1-c)(0.14+0.16s)\right).
+\]
 
-## Thresholds
+The implementation marks a record confirmed only after high support and multiple
+observations. These coefficients are transparent engineering priors selected to
+make the conservative transition testable; they are not fitted estimates.
 
-Initial policy values, to be calibrated:
+## Contradiction policy
 
-- implicit evidence may create a visible candidate at `0.60` confidence after at least two independent interactions;
-- compilation requires `0.67` effective confidence and at least two independent implicit events, or one explicit event;
-- explicit user statements compile immediately but remain editable;
-- locked values compile regardless of inference confidence unless the current prompt overrides them.
+- A newer `direct_statement` supersedes an unlocked inferred value and records the
+  previous/new values in an update event.
+- A `direct_correction` changes an unlocked value with evidence confidence bounded
+  to 0.72--0.82.
+- Conflicting `interaction_pattern` evidence marks the record `ambiguous`, retains
+  the competing value and rationale, and prevents compilation.
+- A locked value is never mutated automatically. The engine emits a
+  `locked_conflict` event so the disagreement is visible.
+- “This preference wasn't relevant here” is an *applicability correction*, not a
+  preference-inference correction. It adds negative scoped evidence while keeping
+  the underlying preference intact.
 
-Confidence is not the probability that personalization will improve an answer. It estimates support for a particular preference assertion given the captured evidence.
+This policy intentionally avoids averaging explicit preference changes forever.
+Recency, explicitness, locks, and scope all matter.
+
+## Decay and activation
+
+Unlocked, inferred records decay at retrieval time:
+
+\[
+c_{eff}=c\exp(-r\Delta_{days}),
+\]
+
+where the current product uses `r=0.002` for explicit evidence and `r=0.01` for
+implicit evidence. Confirmed and locked records do not decay in the reference
+retriever. Unlocked records below 0.35 effective evidence confidence are withheld.
+
+Activation still requires a separate contextual applicability score. A
+high-confidence preference can be irrelevant to the current request.
 
 ## Calibration protocol
 
-Periodically show a stratified sample of inferred preferences and ask users to accept, reject, or edit them. Evaluate reliability diagrams, Brier score, expected calibration error, and coverage versus acceptance. Fit authority/strength coefficients on a development cohort and report performance on held-out users. Never silently optimize confidence using downstream engagement alone.
+The numerical policy must be calibrated with user confirmations before being
+presented as probabilistic. A future study should stratify inferred preferences,
+ask users to accept/reject/edit them, and report reliability diagrams, Brier
+score, expected calibration error, coverage, correction burden, and net
+personalization harm. Coefficients should be fitted on a development cohort and
+reported on held-out users. Engagement alone is not authoritative evidence.
